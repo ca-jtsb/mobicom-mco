@@ -1,10 +1,18 @@
 package com.mobicom.s16.mco
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Size
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.compose.ui.tooling.preview.Preview
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,6 +35,18 @@ class ScannerFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()){
+            isGranted: Boolean ->
+                if(isGranted){
+                    //startCamera()
+                    Toast.makeText(requireContext(), "Camera permission granted", Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_SHORT).show()
+                }
+        }
+        requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
     }
 
     override fun onCreateView(
@@ -56,4 +76,35 @@ class ScannerFragment : Fragment() {
                 }
             }
     }
+
+    //TODO: fix start camera idk why it keeps giving me errors
+    /*private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        val screenSize = Size(1280, 720)
+
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setResolutionStrategy(ResolutionStrategy(screenSize, ResolutionStrategy.FALLBACK_RULE_NONE))
+            .build()
+
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+
+            val preview = Preview.Builder()
+                .setResolutionSelector(resolutionSelector)
+                .build()
+                .also {
+                    it.setSurfaceProvider(binding.previewView.surfaceProvider)
+                }
+
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview)
+            } catch (e: Exception) {
+                Log.e("CameraX", "Camera bind failed", e)
+            }
+
+        }, ContextCompat.getMainExecutor(requireContext()))
+    }*/
 }
