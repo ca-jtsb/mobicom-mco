@@ -2,6 +2,7 @@ package com.mobicom.s16.mco
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.util.Size
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,10 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.camera.core.Preview
+import androidx.core.content.ContextCompat
+import com.mobicom.s16.mco.databinding.FragmentScannerBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -29,24 +33,15 @@ class ScannerFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private var _binding: FragmentScannerBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-
-        val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()){
-            isGranted: Boolean ->
-                if(isGranted){
-                    //startCamera()
-                    Toast.makeText(requireContext(), "Camera permission granted", Toast.LENGTH_SHORT).show()
-                }else{
-                    Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_SHORT).show()
-                }
-        }
-        requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
     }
 
     override fun onCreateView(
@@ -54,7 +49,27 @@ class ScannerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_scanner, container, false)
+        _binding = FragmentScannerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()){
+                isGranted: Boolean ->
+            if(isGranted){
+                startCamera()
+            }else{
+                Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_SHORT).show()
+            }
+        }
+        requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
@@ -77,8 +92,7 @@ class ScannerFragment : Fragment() {
             }
     }
 
-    //TODO: fix start camera idk why it keeps giving me errors
-    /*private fun startCamera() {
+    private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         val screenSize = Size(1280, 720)
 
@@ -106,5 +120,5 @@ class ScannerFragment : Fragment() {
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
-    }*/
+    }
 }
