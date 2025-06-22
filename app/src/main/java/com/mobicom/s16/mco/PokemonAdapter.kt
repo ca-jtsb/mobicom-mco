@@ -1,5 +1,6 @@
 package com.mobicom.s16.mco
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +14,11 @@ class PokemonAdapter(private val data: ArrayList<PokemonModel>): RecyclerView.Ad
 
     override fun onBindViewHolder(holder: PokemonViewHolder, position: Int) {
         holder.bindData(this.data.get(position))
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, CardInfoActivity::class.java)
+            holder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int {

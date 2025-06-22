@@ -15,10 +15,10 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.frameLayout, ScannerFragment())
+                .replace(R.id.frameLayout, ArchiveFragment())
                 .commit()
-            setFabSelected(true)
-            binding.bottomNavigationView.selectedItemId = R.id.scanner
+            setFabSelected(false)
+            binding.bottomNavigationView.selectedItemId = R.id.archive
         }
 
         binding.fab.setOnClickListener {

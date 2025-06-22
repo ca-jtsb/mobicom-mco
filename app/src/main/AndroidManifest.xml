@@ -33,6 +33,9 @@
         <activity
             android:name=".SignupActivity"
             android:exported="true" />
+        <activity
+            android:name=".CardInfoActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
