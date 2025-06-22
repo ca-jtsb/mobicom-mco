@@ -72,6 +72,8 @@
             android:layout_weight="1"
             android:paddingTop="10dp"
             android:text="Create new account"
-            android:textColor="#9D9B9B" />
+            android:textColor="#9D9B9B"
+            android:textSize="18dp"
+            android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

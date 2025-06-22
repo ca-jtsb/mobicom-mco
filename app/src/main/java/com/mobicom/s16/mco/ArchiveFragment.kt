@@ -5,6 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.mobicom.s16.mco.databinding.FragmentArchiveBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,12 +24,26 @@ class ArchiveFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private val pokemonList: ArrayList<PokemonModel> = DataGenerator.loadData()
+    private lateinit var recyclerView: RecyclerView
+
+    private var _binding: FragmentArchiveBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        /*this.recyclerView = binding.archiveRecyclerView
+        this.recyclerView.adapter = PokemonAdapter(this.pokemonList)
+        this.recyclerView.setHasFixedSize(true)
+        this.recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)*/
+
+
+
     }
 
     override fun onCreateView(
@@ -34,7 +51,17 @@ class ArchiveFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_archive, container, false)
+        _binding = FragmentArchiveBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        this.recyclerView = binding.archiveRecyclerView
+        this.recyclerView.adapter = PokemonAdapter(this.pokemonList)
+        this.recyclerView.setHasFixedSize(true)
+        this.recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
     }
 
     companion object {
