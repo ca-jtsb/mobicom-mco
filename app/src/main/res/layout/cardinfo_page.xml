@@ -18,14 +18,17 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/LinearLayoutBody"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="135dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:weightSum="5">
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_weight="4">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -102,8 +105,44 @@
                             android:textSize="16sp" />
                     </LinearLayout>
 
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/priceChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="38dp" />
                 </LinearLayout>
+
+
             </ScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@color/white"
+                android:backgroundTint="@color/white"
+                android:gravity="bottom|center"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Archive" />
+
+                <Button
+                    android:id="@+id/button4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="#C7C6C6"
+                    android:text="Add to Wishlist" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -128,34 +167,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back_white" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/white"
-        android:backgroundTint="@color/white"
-        android:gravity="bottom|center"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Archive" />
-
-        <Button
-            android:id="@+id/button4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="#C7C6C6"
-            android:text="Add to Wishlist" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
