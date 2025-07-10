@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constriantLayout"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:layout_marginLeft="0dp"
-    android:layout_marginRight="0dp"
-    android:background="#FFFFFF"
-    android:gravity="center">
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp">
 
     <ImageView
         android:id="@+id/imgCard"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/card1" />
+        android:layout_height="175dp"
+        android:src="@drawable/card1"/>
+
 
     <!--<ImageView
         android:id="@+id/imageView2"
@@ -38,4 +29,4 @@
         android:paddingRight="5dp"
         app:srcCompat="@drawable/card3" />-->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
