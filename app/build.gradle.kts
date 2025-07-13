@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -56,6 +57,7 @@ dependencies {
     implementation(libs.androidx.camera.camera2.v130)
     implementation(libs.androidx.camera.lifecycle.v130)
     implementation(libs.androidx.camera.view.v130)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,4 +70,5 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("io.coil-kt:coil:2.4.0")
+    implementation ("com.google.mlkit:text-recognition:16.0.0")
 }
