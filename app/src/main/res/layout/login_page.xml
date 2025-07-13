@@ -16,7 +16,7 @@
         app:srcCompat="@drawable/logo1" />
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/etEmailLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#000000"
@@ -27,7 +27,7 @@
         android:textColor="#717171" />
 
     <EditText
-        android:id="@+id/editTextTextPassword"
+        android:id="@+id/etPasswordLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#000000"
