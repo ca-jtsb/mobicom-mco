@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1006689271299",
+    "project_id": "ichooseyou-b0fe2",
+    "storage_bucket": "ichooseyou-b0fe2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006689271299:android:61b916bc64101a5fcad836",
+        "android_client_info": {
+          "package_name": "com.mobicom.s16.mco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC89a7uNa400ARoqZd_OUA6vE9Cgx7m6ZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
