@@ -1,95 +1,83 @@
 package com.mobicom.s16.mco
 
-import android.content.pm.PackageManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.core.Preview
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.mobicom.s16.mco.data.remote.api.RetrofitClient
+import com.mobicom.s16.mco.data.remote.dto.ApiCard
+import com.mobicom.s16.mco.data.remote.dto.CardsResponse
 import com.mobicom.s16.mco.databinding.FragmentScannerBinding
+import com.mobicom.s16.mco.domain.model.Card
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.File
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ScannerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ScannerFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     private var _binding: FragmentScannerBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var imageCapture: ImageCapture
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         _binding = FragmentScannerBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()){
-                isGranted: Boolean ->
-            if(isGranted){
-                startCamera()
-            }else{
-                Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_SHORT).show()
-            }
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) startCamera()
+            else Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_SHORT).show()
         }
+
         requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+        binding.button3.setOnClickListener {
+            val photoFile = File(requireContext().cacheDir, "temp_image.jpg")
+            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ScannerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ScannerFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+            imageCapture.takePicture(
+                outputOptions,
+                ContextCompat.getMainExecutor(requireContext()),
+                object : ImageCapture.OnImageSavedCallback {
+                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                        runTextRecognition(photoFile)
+                    }
+
+                    override fun onError(exception: ImageCaptureException) {
+                        Toast.makeText(requireContext(), "Capture failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+                        Log.e("CameraX", "Capture failed", exception)
+                    }
                 }
-            }
+            )
+        }
     }
 
     private fun startCamera() {
@@ -110,15 +98,110 @@ class ScannerFragment : Fragment() {
                     it.setSurfaceProvider(binding.previewView.surfaceProvider)
                 }
 
+            imageCapture = ImageCapture.Builder()
+                .setTargetResolution(screenSize)
+                .build()
+
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview)
+                cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview, imageCapture)
             } catch (e: Exception) {
                 Log.e("CameraX", "Camera bind failed", e)
             }
-
         }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+    private fun runTextRecognition(imageFile: File) {
+        val image = InputImage.fromFilePath(requireContext(), Uri.fromFile(imageFile))
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+        recognizer.process(image)
+            .addOnSuccessListener { visionText ->
+                val resultText = visionText.text
+                Log.d("OCR", "Full recognized text:\n$resultText")
+
+                // Log by line
+                for (block in visionText.textBlocks) {
+                    for (line in block.lines) {
+                        Log.d("OCR_LINE", line.text)
+                    }
+                }
+
+                // Regex match for card number like 12/108
+                val cardNumberRegex = Regex("""\b\d{1,3}/\d{1,3}\b""")
+                val match = cardNumberRegex.find(resultText)
+                val cardNumber = match?.value
+
+                Log.d("OCR_MATCH", "Extracted card number: $cardNumber")
+
+                if (cardNumber != null) {
+                    searchCardByNumber(cardNumber)
+                } else {
+                    Toast.makeText(requireContext(), "Card number not found", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("OCR", "Text recognition failed", e)
+                Toast.makeText(requireContext(), "OCR failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun searchCardByNumber(cardNumber: String) {
+        val query = "number:$cardNumber"
+        Log.d("API_CALL", "Searching card with query: $query")
+
+        RetrofitClient.api.getCards(query).enqueue(object : Callback<CardsResponse> {
+            override fun onResponse(call: Call<CardsResponse>, response: Response<CardsResponse>) {
+                if (response.isSuccessful) {
+                    val cards = response.body()?.data ?: emptyList()
+                    if (cards.isNotEmpty()) {
+                        val matchedCard = cards.first()
+                        Log.d("API_RESULT", "Matched card: ${matchedCard.name} (${matchedCard.set.name}) - Number: ${matchedCard.number}")
+                        openCardInfo(matchedCard)
+                    } else {
+                        Toast.makeText(requireContext(), "No card found", Toast.LENGTH_SHORT).show()
+                        Log.d("API_RESULT", "No card found in response")
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "API Error: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    Log.e("API_RESULT", "API error: ${response.code()} - ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<CardsResponse>, t: Throwable) {
+                Toast.makeText(requireContext(), "API Failure: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("API_RESULT", "API request failed", t)
+            }
+        })
+    }
+
+    private fun openCardInfo(apiCard: ApiCard) {
+        val card = Card(
+            name = apiCard.name,
+            set = apiCard.set.name ?: "Unknown Set",
+            hp = apiCard.hp ?: "N/A",
+            supertype = apiCard.supertype ?: "N/A",
+            firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
+            price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
+            imageUrl = apiCard.images.large ?: ""
+        )
+
+        val intent = Intent(requireContext(), CardInfoActivity::class.java).apply {
+            putExtra("card_name", card.name)
+            putExtra("card_set", card.set)
+            putExtra("card_hp", card.hp)
+            putExtra("card_supertype", card.supertype)
+            putExtra("card_attack", card.firstAttack)
+            putExtra("card_price", card.price)
+            putExtra("card_image", card.imageUrl)
+        }
+        startActivity(intent)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
