@@ -8,13 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.mobicom.s16.mco.data.remote.api.RetrofitClient
-import com.mobicom.s16.mco.data.remote.dto.CardsResponse
 import com.mobicom.s16.mco.databinding.FragmentArchiveBinding
-import com.mobicom.s16.mco.domain.model.Card
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.mobicom.s16.mco.util.CardCacheManager
 
 class ArchiveFragment : Fragment() {
 
@@ -36,32 +31,15 @@ class ArchiveFragment : Fragment() {
 
         binding.archiveRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        RetrofitClient.api.getCards().enqueue(object : Callback<CardsResponse> {
-            override fun onResponse(call: Call<CardsResponse>, response: Response<CardsResponse>) {
-                if (response.isSuccessful) {
-                    val apiCards = response.body()?.data ?: emptyList()
-                    val cards = apiCards.map { apiCard ->
-                        Card(
-                            name = apiCard.name,
-                            set = apiCard.set.name ?: "Unknown",
-                            hp = apiCard.hp ?: "N/A",
-                            supertype = apiCard.supertype ?: "N/A",
-                            firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
-                            price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
-                            imageUrl = apiCard.images.large ?: ""
-                        )
-                    }
-                    pokemonAdapter = PokemonAdapter(cards)
-                    binding.archiveRecyclerView.adapter = pokemonAdapter
-                } else {
-                    Log.e("ArchiveFragment", "API call unsuccessful")
-                }
-            }
+        val cachedCards = CardCacheManager.loadCardsFromCache(requireContext())
 
-            override fun onFailure(call: Call<CardsResponse>, t: Throwable) {
-                Log.e("ArchiveFragment", "Failed to fetch cards: ${t.message}")
-            }
-        })
+        if (cachedCards.isNotEmpty()) {
+            pokemonAdapter = PokemonAdapter(cachedCards)
+            binding.archiveRecyclerView.adapter = pokemonAdapter
+            Log.d("ArchiveFragment", "Loaded ${cachedCards.size} cards from cache")
+        } else {
+            Log.d("ArchiveFragment", "No cards found in cache")
+        }
     }
 
     override fun onDestroyView() {

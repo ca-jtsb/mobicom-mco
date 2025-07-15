@@ -152,7 +152,7 @@ class ScannerFragment : Fragment() {
         val query = "number:$cardNumber"
         Log.d("API_CALL", "Searching card with query: $query")
 
-        RetrofitClient.api.getCards(query).enqueue(object : Callback<CardsResponse> {
+        RetrofitClient.api.getCards(1, 250).enqueue(object : Callback<CardsResponse> {
             override fun onResponse(call: Call<CardsResponse>, response: Response<CardsResponse>) {
                 if (response.isSuccessful) {
                     val cards = response.body()?.data ?: emptyList()
