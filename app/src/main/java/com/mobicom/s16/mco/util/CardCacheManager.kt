@@ -9,6 +9,7 @@ import java.io.File
 
 object CardCacheManager {
     private const val CACHE_FILE_NAME = "cards_cache.json"
+    private const val TOTAL_EXPECTED_CARDS = 19155
 
     fun isCacheAvailable(context: Context): Boolean {
         val file = File(context.filesDir, CACHE_FILE_NAME)
@@ -34,5 +35,15 @@ object CardCacheManager {
         val cards = Gson().fromJson<List<Card>>(json, type)
         Log.d("CardCacheManager", "Loaded ${cards.size} cards from cache")
         return cards
+    }
+
+    fun getCachedCardCount(context: Context): Int {
+        val file = File(context.filesDir, CACHE_FILE_NAME)
+        if (!file.exists()) return 0
+        return loadCardsFromCache(context).size
+    }
+
+    fun isCacheComplete(context: Context): Boolean {
+        return getCachedCardCount(context) >= TOTAL_EXPECTED_CARDS
     }
 }

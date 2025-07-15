@@ -24,13 +24,23 @@ class DownloadActivity : AppCompatActivity() {
     private var currentPage = 1
     private val maxRetries = 3
     private val failedPages = mutableSetOf<Int>()
+    private var downloadMissingOnly = false
+    private var existingCardsMap = mutableMapOf<String, Card>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDownloadBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Log.d("DownloadActivity", "DownloadActivity started")
+        downloadMissingOnly = intent.getBooleanExtra("missingOnly", false)
+        Log.d("DownloadActivity", "DownloadActivity started, missingOnly=$downloadMissingOnly")
+
+        if (downloadMissingOnly) {
+            val cachedCards = CardCacheManager.loadCardsFromCache(this)
+            allCards.addAll(cachedCards)
+            existingCardsMap = cachedCards.associateBy { it.name }.toMutableMap()
+        }
+
         startDownload()
     }
 
@@ -50,8 +60,8 @@ class DownloadActivity : AppCompatActivity() {
                         val apiCards = response.body()?.data ?: emptyList()
                         Log.d("DownloadActivity", "Page $currentPage: Fetched ${apiCards.size} cards")
 
-                        val cards = apiCards.map { apiCard ->
-                            Card(
+                        val newCards = apiCards.mapNotNull { apiCard ->
+                            val card = Card(
                                 name = apiCard.name,
                                 set = apiCard.set.name ?: "Unknown",
                                 hp = apiCard.hp ?: "N/A",
@@ -60,11 +70,13 @@ class DownloadActivity : AppCompatActivity() {
                                 price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
                                 imageUrl = apiCard.images.large ?: ""
                             )
+                            if (!downloadMissingOnly || !existingCardsMap.containsKey(card.name)) {
+                                card
+                            } else null
                         }
 
-                        allCards.addAll(cards)
+                        allCards.addAll(newCards)
 
-                        // Stop when fewer than pageSize cards are returned (last page)
                         if (apiCards.size < pageSize) {
                             finishDownload()
                         } else {
@@ -73,9 +85,7 @@ class DownloadActivity : AppCompatActivity() {
                         }
                     } else {
                         Log.e("DownloadActivity", "Page $currentPage failed with ${response.code()}")
-
                         if (response.code() == 404) {
-                            // Likely the end of data
                             finishDownload()
                         } else if (retryCount < maxRetries) {
                             downloadNextPage(retryCount + 1)
@@ -106,7 +116,7 @@ class DownloadActivity : AppCompatActivity() {
             Log.w("DownloadActivity", "Failed pages: $failedPages")
         }
 
-        CardCacheManager.saveCardsToCache(this@DownloadActivity, allCards)
+        CardCacheManager.saveCardsToCache(this, allCards)
 
         binding.progressBar.visibility = View.GONE
         binding.statusText.text = "Download complete: ${allCards.size} cards"
