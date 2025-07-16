@@ -53,4 +53,11 @@ class SignupActivity : AppCompatActivity() {
                 }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //val intent = Intent(this, LoginActivity::class.java)
+        //startActivity(intent)
+        finish()
+    }
 }
