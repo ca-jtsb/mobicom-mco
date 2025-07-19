@@ -1,6 +1,7 @@
-package com.mobicom.s16.mco
+package com.mobicom.s16.mco.model
 
 class PokemonModel(name: String, imageId: Int) {
+    //TODO: update parameters to match api variables
     var name = name
         private set
     var imageId = imageId
