@@ -9,6 +9,8 @@ import com.mobicom.s16.mco.util.CardCacheManager
 
 class LauncherActivity : AppCompatActivity() {
 
+    private val skipDownload = true // Toggle
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -16,21 +18,26 @@ class LauncherActivity : AppCompatActivity() {
         Log.d("LauncherActivity", "User is: $user")
 
         if (user != null) {
-            val isAvailable = CardCacheManager.isCacheAvailable(this)
-            val isComplete = CardCacheManager.isCacheComplete(this)
-            Log.d("LauncherActivity", "Card cache available: $isAvailable, complete: $isComplete")
-
-            val intent = if (!isAvailable || !isComplete) {
-                Log.d("LauncherActivity", "Launching DownloadActivity (missing or incomplete cache)")
-                Intent(this, DownloadActivity::class.java).apply {
-                    putExtra("missingOnly", isAvailable) // only fetch missing if file exists
-                }
+            if (skipDownload) {
+                Log.d("LauncherActivity", "skipDownload=true, launching MainActivity directly")
+                startActivity(Intent(this, MainActivity::class.java))
             } else {
-                Log.d("LauncherActivity", "Launching MainActivity")
-                Intent(this, MainActivity::class.java)
-            }
+                val isAvailable = CardCacheManager.isCacheAvailable(this)
+                val isComplete = CardCacheManager.isCacheComplete(this)
+                Log.d("LauncherActivity", "Card cache available: $isAvailable, complete: $isComplete")
 
-            startActivity(intent)
+                val intent = if (!isAvailable || !isComplete) {
+                    Log.d("LauncherActivity", "Launching DownloadActivity (missing or incomplete cache)")
+                    Intent(this, DownloadActivity::class.java).apply {
+                        putExtra("missingOnly", isAvailable)
+                    }
+                } else {
+                    Log.d("LauncherActivity", "Launching MainActivity")
+                    Intent(this, MainActivity::class.java)
+                }
+
+                startActivity(intent)
+            }
         } else {
             Log.d("LauncherActivity", "User not signed in, going to LoginActivity")
             startActivity(Intent(this, LoginActivity::class.java))
@@ -39,3 +46,4 @@ class LauncherActivity : AppCompatActivity() {
         finish()
     }
 }
+

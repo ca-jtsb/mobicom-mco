@@ -41,7 +41,7 @@ class DownloadActivity : AppCompatActivity() {
             existingCardsMap = cachedCards.associateBy { it.name }.toMutableMap()
         }
 
-        startDownload()
+       startDownload()
     }
 
     private fun startDownload() {
@@ -68,7 +68,8 @@ class DownloadActivity : AppCompatActivity() {
                                 supertype = apiCard.supertype ?: "N/A",
                                 firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
                                 price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
-                                imageUrl = apiCard.images.large ?: ""
+                                imageUrl = apiCard.images.large ?: "",
+                                rarity = apiCard.rarity ?: "Unknown"
                             )
                             if (!downloadMissingOnly || !existingCardsMap.containsKey(card.name)) {
                                 card
