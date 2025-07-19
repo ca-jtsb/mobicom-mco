@@ -10,5 +10,6 @@ data class ApiCard(
     val attacks: List<Attack>?,
     val set: SetInfo,
     val images: Images,
-    val tcgplayer: TcgPlayer?
+    val tcgplayer: TcgPlayer?,
+    val rarity: String?
 )

@@ -7,5 +7,6 @@ data class Card(
     val supertype: String,
     val firstAttack: String,
     val price: String,
-    val imageUrl: String
+    val imageUrl: String,
+    val rarity: String?
 )
