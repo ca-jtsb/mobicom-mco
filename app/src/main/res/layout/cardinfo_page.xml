@@ -121,17 +121,19 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_margin="15dp"
                 android:background="@color/white"
                 android:backgroundTint="@color/white"
                 android:gravity="bottom|center"
                 android:orientation="horizontal"
+                android:paddingBottom="5dp"
                 android:weightSum="2">
 
                 <Button
                     android:id="@+id/button2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
                     android:layout_weight="1"
                     android:text="Archive" />
 
@@ -139,6 +141,7 @@
                     android:id="@+id/button4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
                     android:layout_weight="1"
                     android:backgroundTint="#C7C6C6"
                     android:text="Add to Wishlist" />
