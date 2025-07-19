@@ -185,7 +185,8 @@ class ScannerFragment : Fragment() {
             supertype = apiCard.supertype ?: "N/A",
             firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
             price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
-            imageUrl = apiCard.images.large ?: ""
+            imageUrl = apiCard.images.large ?: "",
+            rarity = apiCard.rarity ?: "Unknown"
         )
 
         val intent = Intent(requireContext(), CardInfoActivity::class.java).apply {

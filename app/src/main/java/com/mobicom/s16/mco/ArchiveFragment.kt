@@ -1,22 +1,20 @@
+// ArchiveFragment.kt
 package com.mobicom.s16.mco
 
-import PokemonAdapter
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.tabs.TabLayoutMediator
 import com.mobicom.s16.mco.databinding.FragmentArchiveBinding
-import com.mobicom.s16.mco.util.CardCacheManager
 
 class ArchiveFragment : Fragment() {
 
     private var _binding: FragmentArchiveBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var pokemonAdapter: PokemonAdapter
+    private lateinit var pagerAdapter: CardTabPagerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,17 +27,21 @@ class ArchiveFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.archiveRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+        pagerAdapter = CardTabPagerAdapter(this)
+        binding.viewPager.adapter = pagerAdapter
 
-        val cachedCards = CardCacheManager.loadCardsFromCache(requireContext())
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = if (position == 0) "Archive" else "Wishlist"
+        }.attach()
 
-        if (cachedCards.isNotEmpty()) {
-            pokemonAdapter = PokemonAdapter(cachedCards)
-            binding.archiveRecyclerView.adapter = pokemonAdapter
-            Log.d("ArchiveFragment", "Loaded ${cachedCards.size} cards from cache")
-        } else {
-            Log.d("ArchiveFragment", "No cards found in cache")
+        binding.ivFilter.setOnClickListener {
+            val dialog = CardFilterDialog { set, type, rarity ->
+                (pagerAdapter.createFragment(binding.viewPager.currentItem) as? FilterableTab)?.applyFilters(set, type, rarity)
+            }
+            dialog.show(parentFragmentManager, "FilterDialog")
         }
+
+        // Search behavior will be implemented later for both local and global
     }
 
     override fun onDestroyView() {

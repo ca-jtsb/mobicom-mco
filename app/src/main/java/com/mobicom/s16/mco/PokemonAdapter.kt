@@ -8,7 +8,7 @@ import com.mobicom.s16.mco.CardInfoActivity
 import com.mobicom.s16.mco.databinding.CardRowBinding
 import com.mobicom.s16.mco.domain.model.Card
 
-class PokemonAdapter(private val cards: List<Card>) :
+class PokemonAdapter(private var cards: List<Card>) :
     RecyclerView.Adapter<PokemonAdapter.CardViewHolder>() {
 
     inner class CardViewHolder(val binding: CardRowBinding) :
@@ -21,21 +21,22 @@ class PokemonAdapter(private val cards: List<Card>) :
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val card = cards[position]
-        with(holder.binding) {
-//            txtCardName.text = card.name
-//            txtCardPrice.text = "Price: ${card.price}"
-            Glide.with(imgCard.context)
-                .load(card.imageUrl)
-                .into(imgCard)
-        }
+        Glide.with(holder.binding.imgCard.context)
+            .load(card.imageUrl)
+            .into(holder.binding.imgCard)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, CardInfoActivity::class.java)
-            //  putExtra() card details here
+            // TODO: pass card details
             holder.itemView.context.startActivity(intent)
         }
     }
 
     override fun getItemCount(): Int = cards.size
+
+    fun updateData(newCards: List<Card>) {
+        cards = newCards
+        notifyDataSetChanged()
+    }
 }
 
