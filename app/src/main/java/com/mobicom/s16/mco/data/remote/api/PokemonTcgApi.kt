@@ -16,6 +16,11 @@ interface PokemonTcgApi {
         @Query("pageSize") pageSize: Int = 250
     ): Call<CardsResponse>
 
+    @GET("cards")
+    fun searchCardByNameAndNumber(
+        @Query("q") query: String
+    ): Call<CardsResponse>
+
     @GET("cards/{id}")
     fun getCardById(
         @Path("id") id: String

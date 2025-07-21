@@ -10,10 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -68,6 +65,7 @@ class ScannerFragment : Fragment() {
                 ContextCompat.getMainExecutor(requireContext()),
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                        Toast.makeText(requireContext(), "Image captured. Scanning...", Toast.LENGTH_SHORT).show()
                         runTextRecognition(photoFile)
                     }
 
@@ -99,6 +97,7 @@ class ScannerFragment : Fragment() {
                 }
 
             imageCapture = ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 .setTargetResolution(screenSize)
                 .build()
 
@@ -117,29 +116,61 @@ class ScannerFragment : Fragment() {
         val image = InputImage.fromFilePath(requireContext(), Uri.fromFile(imageFile))
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
+        // Get focusBox bounds
+        val focusTop = binding.focusBox.top
+        val focusBottom = binding.focusBox.bottom
+
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
-                val resultText = visionText.text
-                Log.d("OCR", "Full recognized text:\n$resultText")
+                Log.d("OCR", "Full recognized text:\n${visionText.text}")
 
-                // Log by line
+                var cardNumberRaw: String? = null
+                var cardName: String? = null
+                val cardNumberRegex = Regex("""\b(\d{1,3})/(\d{1,3})\b""")
+
                 for (block in visionText.textBlocks) {
                     for (line in block.lines) {
-                        Log.d("OCR_LINE", line.text)
+                        val y = line.boundingBox?.centerY() ?: continue
+                        val lineText = line.text.trim()
+                        val cleanedLine = lineText.replace(Regex("[^0-9/]"), "")
+
+                        // Only use lines inside focus box vertical range
+                        if (y in focusTop..focusBottom) {
+                            Log.d("OCR_FILTERED_LINE", "Line (y=$y): $lineText")
+
+                            if (cardNumberRaw == null && cardNumberRegex.containsMatchIn(cleanedLine)) {
+                                cardNumberRaw = cardNumberRegex.find(cleanedLine)?.value
+                            }
+
+                            if (cardName == null && lineText.length in 3..30 && !lineText.contains("/")) {
+                                cardName = lineText
+                            }
+                        }
                     }
                 }
 
-                // Regex match for card number like 12/108
-                val cardNumberRegex = Regex("""\b\d{1,3}/\d{1,3}\b""")
-                val match = cardNumberRegex.find(resultText)
-                val cardNumber = match?.value
+                // Fallback name if not found inside focus box
+                if (cardName == null) {
+                    cardName = visionText.text.lines()
+                        .firstOrNull { it.length in 3..30 && !it.contains("/") }
+                        ?.trim()
+                }
 
-                Log.d("OCR_MATCH", "Extracted card number: $cardNumber")
+                Log.d("OCR_RESULT", "Detected card number: $cardNumberRaw")
+                Log.d("OCR_RESULT", "Detected card name: $cardName")
 
-                if (cardNumber != null) {
-                    searchCardByNumber(cardNumber)
+                if (cardNumberRaw != null && cardName != null) {
+                    val parts = cardNumberRaw.split("/")
+                    val cardNumber = parts.getOrNull(0)?.trim()
+                    val printedTotal = parts.getOrNull(1)?.trim()?.toIntOrNull()
+
+                    if (cardNumber != null && printedTotal != null) {
+                        searchCardByNumberAndName(cardNumber, printedTotal, cardName)
+                    } else {
+                        Toast.makeText(requireContext(), "Invalid card number format", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(requireContext(), "Card number not found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Card number or name not found", Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener { e ->
@@ -148,21 +179,30 @@ class ScannerFragment : Fragment() {
             }
     }
 
-    private fun searchCardByNumber(cardNumber: String) {
-        val query = "number:$cardNumber"
-        Log.d("API_CALL", "Searching card with query: $query")
 
-        RetrofitClient.api.getCards(1, 250).enqueue(object : Callback<CardsResponse> {
+
+
+    private fun searchCardByNumberAndName(cardNumber: String, printedTotal: Int, cardName: String) {
+        val query = "number:\"$cardNumber\""
+        Log.d("API_CALL", "Searching with: number=$cardNumber, printedTotal=$printedTotal, name=$cardName")
+
+        RetrofitClient.api.searchCardByNameAndNumber(query).enqueue(object : Callback<CardsResponse> {
             override fun onResponse(call: Call<CardsResponse>, response: Response<CardsResponse>) {
                 if (response.isSuccessful) {
                     val cards = response.body()?.data ?: emptyList()
-                    if (cards.isNotEmpty()) {
-                        val matchedCard = cards.first()
-                        Log.d("API_RESULT", "Matched card: ${matchedCard.name} (${matchedCard.set.name}) - Number: ${matchedCard.number}")
+                    val matchedCards = cards.filter {
+                        it.set.printedTotal == printedTotal &&
+                                it.name.equals(cardName, ignoreCase = true)
+                    }
+
+                    if (matchedCards.isNotEmpty()) {
+                        val matchedCard = matchedCards.first()
+                        Log.d("CARD_MATCH", "Matched: ${matchedCard.name} ${matchedCard.number}/${matchedCard.set.printedTotal}")
+                        Toast.makeText(requireContext(), "Detected: ${matchedCard.name} (#${matchedCard.number})", Toast.LENGTH_SHORT).show()
                         openCardInfo(matchedCard)
                     } else {
-                        Toast.makeText(requireContext(), "No card found", Toast.LENGTH_SHORT).show()
-                        Log.d("API_RESULT", "No card found in response")
+                        Toast.makeText(requireContext(), "No exact match found", Toast.LENGTH_SHORT).show()
+                        Log.d("API_RESULT", "No matching cards found after filtering")
                     }
                 } else {
                     Toast.makeText(requireContext(), "API Error: ${response.code()}", Toast.LENGTH_SHORT).show()

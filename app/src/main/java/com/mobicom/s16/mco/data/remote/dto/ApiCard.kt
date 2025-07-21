@@ -6,6 +6,7 @@ data class ApiCard(
     val name: String,
     val supertype: String?,
     val number: Number?,
+    val printedTotal: Number?,
     val hp: String?,
     val attacks: List<Attack>?,
     val set: SetInfo,
