@@ -78,4 +78,7 @@ class WishlistTabFragment : Fragment(), FilterableTab {
         super.onDestroyView()
         _binding = null
     }
+
+    fun getWishlistCards(): List<Card> = wishlistCards
+
 }

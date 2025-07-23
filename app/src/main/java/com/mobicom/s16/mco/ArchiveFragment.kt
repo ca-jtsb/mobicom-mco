@@ -40,31 +40,28 @@ class ArchiveFragment : Fragment() {
         }.attach()
 
         binding.ivFilter.setOnClickListener {
-            val dialog = CardFilterDialog(
-                defaultSet = currentSet,
-                defaultType = currentType,
-                defaultRarity = currentRarity
-            ) { set, type, rarity ->
-                currentSet = set
-                currentType = type
-                currentRarity = rarity
+            val currentFragment = getCurrentTabFragment()
 
-                val currentFragment = getCurrentTabFragment()
-                Log.d("ArchiveFragment", "Applying filters to tab: $currentFragment")
-                if (currentFragment is FilterableTab) {
+            if (currentFragment is WishlistTabFragment) {
+                val wishlistCards = currentFragment.getWishlistCards()
+
+                val dialog = CardFilterDialog(
+                    cards = wishlistCards, // only from wishlist
+                    defaultSet = currentSet,
+                    defaultType = currentType,
+                    defaultRarity = currentRarity
+                ) { set, type, rarity ->
+                    currentSet = set
+                    currentType = type
+                    currentRarity = rarity
+
                     currentFragment.applyFilters(set, type, rarity)
-                } else {
-                    binding.viewPager.postDelayed({
-                        val retryFragment = getCurrentTabFragment()
-                        if (retryFragment is FilterableTab) {
-                            retryFragment.applyFilters(set, type, rarity)
-                        }
-                    }, 300)
                 }
-            }
 
-            dialog.show(parentFragmentManager, "FilterDialog")
+                dialog.show(parentFragmentManager, "FilterDialog")
+            }
         }
+
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

@@ -9,15 +9,15 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mobicom.s16.mco.databinding.FilterPopupBinding
-import com.mobicom.s16.mco.util.CardCacheManager
+import com.mobicom.s16.mco.domain.model.Card
 
 class CardFilterDialog(
+    private val cards: List<Card>,
     private val defaultSet: String? = null,
     private val defaultType: String? = null,
     private val defaultRarity: String? = null,
     private val onFilterSelected: (String?, String?, String?) -> Unit
-) : BottomSheetDialogFragment()
- {
+) : BottomSheetDialogFragment() {
 
     private var _binding: FilterPopupBinding? = null
     private val binding get() = _binding!!
@@ -34,7 +34,7 @@ class CardFilterDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val cards = CardCacheManager.loadCardsFromCache(requireContext())
+//        val cards = CardCacheManager.loadCardsFromCache(requireContext())
         val sets = cards.mapNotNull { it.set }.distinct().sorted()
         val types = cards.mapNotNull { it.supertype }.distinct().sorted()
         val rarities = cards.mapNotNull { it.rarity }.distinct().sorted()
