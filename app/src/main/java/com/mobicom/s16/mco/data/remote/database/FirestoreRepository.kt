@@ -17,39 +17,83 @@ object FirestoreRepository {
             return
         }
 
-        val dummyCard = Card(
-            name = "Pikachu",
-            set = "Base Set",
-            hp = "60",
-            supertype = "Pokémon",
-            firstAttack = "Thunder Jolt",
-            price = "1.50",
-            imageUrl = "https://images.pokemontcg.io/basep/1_hires.png",
-            rarity = "Common"
+        val dummyCards = listOf(
+            Card(
+                name = "Aggron",
+                set = "HS—Triumphant",
+                hp = "140",
+                supertype = "Pokémon",
+                firstAttack = "Metal Claw",
+                price = "2.75",
+                imageUrl = "https://images.pokemontcg.io/hgss4/1_hires.png",
+                rarity = "Rare Holo"
+            ),
+            Card(
+                name = "Weedle",
+                set = "Primal Clash",
+                hp = "50",
+                supertype = "Pokémon",
+                firstAttack = "String Shot",
+                price = "0.20",
+                imageUrl = "https://images.pokemontcg.io/xy5/1_hires.png",
+                rarity = "Common"
+            ),
+            Card(
+                name = "Ampharos (Platinum)",
+                set = "Platinum",
+                hp = "130",
+                supertype = "Pokémon",
+                firstAttack = "Gigavolt",
+                price = "1.95",
+                imageUrl = "https://images.pokemontcg.io/pl1/1_hires.png",
+                rarity = "Rare Holo"
+            ),
+            Card(
+                name = "Ampharos (Secret Wonders)",
+                set = "Secret Wonders",
+                hp = "130",
+                supertype = "Pokémon",
+                firstAttack = "Jamming",
+                price = "2.50",
+                imageUrl = "https://images.pokemontcg.io/dp3/1_hires.png",
+                rarity = "Rare Holo"
+            ),
+            Card(
+                name = "Altaria",
+                set = "HS—Triumphant",
+                hp = "90",
+                supertype = "Pokémon",
+                firstAttack = "Sing",
+                price = "1.25",
+                imageUrl = "https://images.pokemontcg.io/hgss4/2_hires.png",
+                rarity = "Rare Holo"
+            )
         )
 
-        val cardMap = hashMapOf(
-            "name" to dummyCard.name,
-            "set" to dummyCard.set,
-            "hp" to dummyCard.hp,
-            "supertype" to dummyCard.supertype,
-            "firstAttack" to dummyCard.firstAttack,
-            "price" to dummyCard.price,
-            "imageUrl" to dummyCard.imageUrl,
-            "rarity" to dummyCard.rarity
-        )
+        for (card in dummyCards) {
+            val cardMap = hashMapOf(
+                "name" to card.name,
+                "set" to card.set,
+                "hp" to card.hp,
+                "supertype" to card.supertype,
+                "firstAttack" to card.firstAttack,
+                "price" to card.price,
+                "imageUrl" to card.imageUrl,
+                "rarity" to card.rarity
+            )
 
-        firestore.collection("users")
-            .document(user.uid)
-            .collection("wishlist")
-            .document("pikachu-card")
-            .set(cardMap)
-            .addOnSuccessListener {
-                Log.d("FirestoreRepo", "Dummy card added to wishlist")
-            }
-            .addOnFailureListener { e ->
-                Log.e("FirestoreRepo", "Failed to add dummy card", e)
-            }
+            firestore.collection("users")
+                .document(user.uid)
+                .collection("wishlist")
+                .document(card.name.lowercase().replace(" ", "-").replace("(", "").replace(")", "") + "-card")
+                .set(cardMap)
+                .addOnSuccessListener {
+                    Log.d("FirestoreRepo", "Added dummy card: ${card.name}")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreRepo", "Failed to add card: ${card.name}", e)
+                }
+        }
     }
 
     fun getUserWishlistCards(onResult: (List<Card>) -> Unit, onError: (Exception) -> Unit) {
@@ -62,18 +106,14 @@ object FirestoreRepository {
             .addOnSuccessListener { result ->
                 val cards = result.mapNotNull { doc ->
                     try {
-                        val card = doc.toObject(Card::class.java)
-                        Log.d("FirestoreRepo", "Successfully parsed card: ${card.name}")
-                        card
+                        doc.toObject(Card::class.java)
                     } catch (e: Exception) {
-                        Log.e("FirestoreRepo", "Failed to parse card: ${doc.id}", e)
                         null
                     }
                 }
                 onResult(cards)
             }
             .addOnFailureListener { e ->
-                Log.e("FirestoreRepo", "Failed to fetch wishlist cards", e)
                 onError(e)
             }
     }
