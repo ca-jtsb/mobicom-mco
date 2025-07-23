@@ -11,7 +11,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mobicom.s16.mco.databinding.FilterPopupBinding
 import com.mobicom.s16.mco.util.CardCacheManager
 
-class CardFilterDialog(private val onFilterSelected: (String?, String?, String?) -> Unit) : BottomSheetDialogFragment() {
+class CardFilterDialog(
+    private val defaultSet: String? = null,
+    private val defaultType: String? = null,
+    private val defaultRarity: String? = null,
+    private val onFilterSelected: (String?, String?, String?) -> Unit
+) : BottomSheetDialogFragment()
+ {
 
     private var _binding: FilterPopupBinding? = null
     private val binding get() = _binding!!
@@ -33,28 +39,31 @@ class CardFilterDialog(private val onFilterSelected: (String?, String?, String?)
         val types = cards.mapNotNull { it.supertype }.distinct().sorted()
         val rarities = cards.mapNotNull { it.rarity }.distinct().sorted()
 
-        setupSpinner(binding.spinnerSet, sets) { selectedSet = it }
-        setupSpinner(binding.spinnerCardType, types) { selectedType = it }
-        setupSpinner(binding.spinnerRarity, rarities) { selectedRarity = it }
+        setupSpinner(binding.spinnerSet, sets, defaultSet) { selectedSet = it }
+        setupSpinner(binding.spinnerCardType, types, defaultType) { selectedType = it }
+        setupSpinner(binding.spinnerRarity, rarities, defaultRarity) { selectedRarity = it }
 
-        // ✅ Only apply filters if the user clicks the button
         binding.btnApply.setOnClickListener {
             onFilterSelected(selectedSet, selectedType, selectedRarity)
             dismiss()
         }
     }
 
-    private fun setupSpinner(spinner: Spinner, options: List<String>, onSelected: (String?) -> Unit) {
-        val items = listOf("All") + options
-        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_dropdown_item, items)
-        spinner.adapter = adapter
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                onSelected(if (position == 0) null else items[position])
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-    }
+     private fun setupSpinner(spinner: Spinner, options: List<String>, defaultValue: String?, onSelected: (String?) -> Unit) {
+         val items = listOf("All") + options
+         val adapter = ArrayAdapter(requireContext(), R.layout.spinner_dropdown_item, items)
+         spinner.adapter = adapter
+
+         val defaultPosition = defaultValue?.let { items.indexOf(it) }?.takeIf { it >= 0 } ?: 0
+         spinner.setSelection(defaultPosition)
+
+         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                 onSelected(if (position == 0) null else items[position])
+             }
+             override fun onNothingSelected(parent: AdapterView<*>) {}
+         }
+     }
 
     override fun onDestroyView() {
         super.onDestroyView()

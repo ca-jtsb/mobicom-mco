@@ -21,6 +21,11 @@ class WishlistTabFragment : Fragment(), FilterableTab {
     private var wishlistCards: List<Card> = emptyList()
     private lateinit var adapter: PokemonAdapter
 
+    private var currentSet: String? = null
+    private var currentType: String? = null
+    private var currentRarity: String? = null
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,28 +41,37 @@ class WishlistTabFragment : Fragment(), FilterableTab {
 
         adapter = PokemonAdapter(emptyList())
         binding.recyclerView.adapter = adapter
+
         val user = FirebaseAuth.getInstance().currentUser
         Log.d("WishlistTabFragment", "Current user: ${user?.uid ?: "null"}")
-        // 🔁 Fetch Firestore cards AFTER adapter is set
+
         FirestoreRepository.getUserWishlistCards(
             onResult = { cards ->
                 wishlistCards = cards
-                adapter.updateData(cards)
+                Log.d("WishlistTabFragment", "Loaded ${cards.size} cards from Firestore")
+
+                // Apply filters now that cards are available
+                refreshAdapter()
             },
-            onError = { e ->
-                e.printStackTrace()
-                // Optional: show error UI
-            }
+            onError = { e -> e.printStackTrace() }
         )
     }
 
-    override fun applyFilters(set: String?, type: String?, rarity: String?) {
+    private fun refreshAdapter() {
         val filtered = wishlistCards.filter { card ->
-            (set == null || card.set.equals(set, ignoreCase = true)) &&
-                    (type == null || card.supertype.equals(type, ignoreCase = true)) &&
-                    (rarity == null || card.rarity.equals(rarity, ignoreCase = true))
+            (currentSet == null || card.set.equals(currentSet, ignoreCase = true)) &&
+                    (currentType == null || card.supertype.equals(currentType, ignoreCase = true)) &&
+                    (currentRarity == null || card.rarity?.equals(currentRarity, ignoreCase = true) == true)
         }
         adapter.updateData(filtered)
+    }
+
+    override fun applyFilters(set: String?, type: String?, rarity: String?) {
+        Log.d("WishlistFilter", "Applying filters: set=$set, type=$type, rarity=$rarity")
+        currentSet = set
+        currentType = type
+        currentRarity = rarity
+        refreshAdapter()
     }
 
     override fun onDestroyView() {

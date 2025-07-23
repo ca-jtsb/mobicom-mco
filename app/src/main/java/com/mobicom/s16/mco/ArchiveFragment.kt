@@ -2,10 +2,12 @@
 package com.mobicom.s16.mco
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mobicom.s16.mco.databinding.FragmentArchiveBinding
 
@@ -15,6 +17,9 @@ class ArchiveFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var pagerAdapter: CardTabPagerAdapter
+    private var currentSet: String? = null
+    private var currentType: String? = null
+    private var currentRarity: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,17 +40,52 @@ class ArchiveFragment : Fragment() {
         }.attach()
 
         binding.ivFilter.setOnClickListener {
-            val dialog = CardFilterDialog { set, type, rarity ->
-                (pagerAdapter.createFragment(binding.viewPager.currentItem) as? FilterableTab)?.applyFilters(set, type, rarity)
+            val dialog = CardFilterDialog(
+                defaultSet = currentSet,
+                defaultType = currentType,
+                defaultRarity = currentRarity
+            ) { set, type, rarity ->
+                currentSet = set
+                currentType = type
+                currentRarity = rarity
+
+                val currentFragment = getCurrentTabFragment()
+                Log.d("ArchiveFragment", "Applying filters to tab: $currentFragment")
+                if (currentFragment is FilterableTab) {
+                    currentFragment.applyFilters(set, type, rarity)
+                } else {
+                    binding.viewPager.postDelayed({
+                        val retryFragment = getCurrentTabFragment()
+                        if (retryFragment is FilterableTab) {
+                            retryFragment.applyFilters(set, type, rarity)
+                        }
+                    }, 300)
+                }
             }
+
             dialog.show(parentFragmentManager, "FilterDialog")
         }
 
-        // Search behavior will be implemented later for both local and global
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val currentFragment = getCurrentTabFragment()
+                if (currentFragment is FilterableTab) {
+                    currentFragment.applyFilters(currentSet, currentType, currentRarity)
+                }
+            }
+        })
+
+        // TODO: Search function here
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+
+    private fun getCurrentTabFragment(): Fragment? {
+        return childFragmentManager.fragments
+            .firstOrNull { it.isVisible }
     }
 }
