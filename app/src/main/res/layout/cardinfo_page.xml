@@ -10,18 +10,20 @@
         android:id="@+id/frameLayout"
         android:layout_width="409dp"
         android:layout_height="0dp"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="150dp"
         android:background="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
         <LinearLayout
             android:id="@+id/LinearLayoutBody"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="135dp"
+            android:layout_marginTop="100dp"
             android:orientation="vertical"
             android:weightSum="5">
 
@@ -36,7 +38,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/textView3"
+                        android:id="@+id/tvCardName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
@@ -46,7 +48,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView4"
+                        android:id="@+id/tvSeries"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-thin"
@@ -57,7 +59,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView8"
+                        android:id="@+id/tvPrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
@@ -74,7 +76,336 @@
                         android:layout_marginEnd="24dp"
                         android:orientation="vertical">
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvNumLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Number"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvNum"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="184/159"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvRarityLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Rarity"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvRarity"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Special Illustration Rare"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvTypeLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Type"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvType"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Psychic"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvHPLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="HP"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvHP"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="190"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvStageLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Stage"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvStage"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Basic"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvAbilityLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Ability"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvAbility"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Fairy Zone"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+
                         <TextView
+                            android:id="@+id/tvAbilityDesc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:paddingBottom="3dp"
+                            android:text="The Weakness of each of your opponent's Dragon Pokémon in play is now Psychic. (Apply Weakness as ×2.)"
+                            android:textColor="#000000"
+                            android:textSize="12sp" />
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvAttack1Lbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Attack 1"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvAttack1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Full Moon Rondo (20+)"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvAttack1Desc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:paddingBottom="3dp"
+                            android:text="This attack does 20 more damage for each Benched Pokémon (both yours and your opponent’s)."
+                            android:textColor="#000000"
+                            android:textSize="12sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvAttack2Lbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Attack 2"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvAttack2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Name"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvAttack3Desc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif"
+                            android:paddingBottom="3dp"
+                            android:text="desc"
+                            android:textColor="#000000"
+                            android:textSize="12sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvWeaknessLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Weakness"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvWeakness"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Mx2"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvResistanceLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Resistance"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvResistance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:weightSum="2">
+
+                            <TextView
+                                android:id="@+id/tvRetreatLbl"
+                                android:layout_width="198dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Retreat Cost"
+                                android:textColor="#000000"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvRetreat"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="1"
+                                android:textColor="#000000"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <!--<TextView
                             android:id="@+id/textView13"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -102,7 +433,7 @@
                             android:text="Card Text: Ability — Fairy Zone"
                             android:textAlignment="gravity"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp" />-->
                     </LinearLayout>
 
 
@@ -130,15 +461,16 @@
                 android:weightSum="2">
 
                 <Button
-                    android:id="@+id/button2"
+                    android:id="@+id/btnArchive"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
                     android:layout_weight="1"
+                    android:backgroundTint="#6FC39D"
                     android:text="Archive" />
 
                 <Button
-                    android:id="@+id/button4"
+                    android:id="@+id/btnWishlist"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
@@ -153,10 +485,11 @@
 
     <ImageView
         android:id="@+id/imgCard"
-        android:layout_width="221dp"
-        android:layout_height="347dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="160dp"
+        android:layout_height="220dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/card1" />
