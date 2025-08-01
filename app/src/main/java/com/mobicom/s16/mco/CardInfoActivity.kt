@@ -12,8 +12,10 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.mobicom.s16.mco.databinding.CardinfoPageBinding
 
+
 class CardInfoActivity : AppCompatActivity() {
     private lateinit var binding: CardinfoPageBinding
+    private lateinit var cardToArchive: com.mobicom.s16.mco.domain.model.Card
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -169,7 +171,71 @@ class CardInfoActivity : AppCompatActivity() {
 
         // Handle retreat cost
         binding.tvRetreat.text = retreatCost.toString()
+
+
+        cardToArchive = com.mobicom.s16.mco.domain.model.Card(
+            name = cardName,
+            supertype = supertype,
+            subtypes = subtypes,
+            hp = hp,
+            types = types,
+            evolvesFrom = evolvesFrom,
+            evolvesTo = evolvesTo,
+            attacks = listOfNotNull(
+                if (attack1Name.isNotEmpty()) com.mobicom.s16.mco.domain.model.Attack(
+                    name = attack1Name,
+                    text = attack1Text,
+                    damage = attack1Damage,
+                    cost = attack1CostTypes
+                ) else null,
+                if (attack2Name.isNotEmpty()) com.mobicom.s16.mco.domain.model.Attack(
+                    name = attack2Name,
+                    text = attack2Text,
+                    damage = attack2Damage,
+                    cost = attack2CostTypes
+                ) else null
+            ),
+            abilities = if (abilityName.isNotEmpty()) listOf(
+                com.mobicom.s16.mco.domain.model.Ability(
+                    name = abilityName,
+                    text = abilityText,
+                    type = abilityType
+                )
+            ) else null,
+            weaknesses = if (weaknessType.isNotEmpty()) listOf(
+                com.mobicom.s16.mco.domain.model.Weakness(
+                    type = weaknessType,
+                    value = weaknessValue
+                )
+            ) else null,
+            resistances = if (resistanceType.isNotEmpty()) listOf(
+                com.mobicom.s16.mco.domain.model.Resistance(
+                    type = resistanceType,
+                    value = resistanceValue
+                )
+            ) else null,
+            retreatCost = retreatCostTypes,
+            convertedRetreatCost = retreatCost,
+            set = set,
+            setId = "", // Fill if you have it
+            setSeries = setSeries,
+            number = number,
+            artist = artist,
+            rarity = rarity,
+            flavorText = flavorText,
+            imageUrl = imageUrl,
+            imageUrlLarge = imageUrlLarge,
+            price = price,
+            priceSource = priceSource
+        )
+
+        binding.btnArchive.setOnClickListener {
+            archiveCard()
+        }
+
     }
+
+
 
     private fun hideAbilitySection() {
         binding.tvAbilityLbl.visibility = View.GONE
@@ -188,7 +254,22 @@ class CardInfoActivity : AppCompatActivity() {
         binding.tvAttack2.visibility = View.GONE
         binding.tvAttack3Desc.visibility = View.GONE
     }
+
+    private fun archiveCard() {
+        com.mobicom.s16.mco.data.remote.firebase.FirestoreRepository.archiveCard(
+            card = cardToArchive,
+            onSuccess = {
+                finish() // Close activity or show a toast/snackbar
+            },
+            onFailure = {
+                it.printStackTrace()
+                // Optionally show error message
+            }
+        )
+    }
 }
+
+
 
 fun setupDummyLineChart(lineChart: LineChart) {
     // Dummy data entries (x: days, y: price)
