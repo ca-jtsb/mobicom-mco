@@ -66,8 +66,8 @@ class DownloadActivity : AppCompatActivity() {
                                 set = apiCard.set.name ?: "Unknown",
                                 hp = apiCard.hp ?: "N/A",
                                 supertype = apiCard.supertype ?: "N/A",
-                                firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
-                                price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
+//                                firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
+//                                price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
                                 imageUrl = apiCard.images.large ?: "",
                                 rarity = apiCard.rarity ?: "Unknown"
                             )

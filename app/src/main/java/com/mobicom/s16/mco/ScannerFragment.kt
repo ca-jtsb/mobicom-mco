@@ -10,7 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -223,8 +226,8 @@ class ScannerFragment : Fragment() {
             set = apiCard.set.name ?: "Unknown Set",
             hp = apiCard.hp ?: "N/A",
             supertype = apiCard.supertype ?: "N/A",
-            firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
-            price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
+//            firstAttack = apiCard.attacks?.firstOrNull()?.name ?: "None",
+//            price = apiCard.tcgplayer?.prices?.holofoil?.market?.toString() ?: "N/A",
             imageUrl = apiCard.images.large ?: "",
             rarity = apiCard.rarity ?: "Unknown"
         )
@@ -234,7 +237,7 @@ class ScannerFragment : Fragment() {
             putExtra("card_set", card.set)
             putExtra("card_hp", card.hp)
             putExtra("card_supertype", card.supertype)
-            putExtra("card_attack", card.firstAttack)
+//            putExtra("card_attack", card.firstAttack)
             putExtra("card_price", card.price)
             putExtra("card_image", card.imageUrl)
         }

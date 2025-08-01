@@ -23,8 +23,8 @@ object FirestoreRepository {
                 set = "HS—Triumphant",
                 hp = "140",
                 supertype = "Pokémon",
-                firstAttack = "Metal Claw",
-                price = "2.75",
+//                firstAttack = "Metal Claw",
+//                price = "2.75",
                 imageUrl = "https://images.pokemontcg.io/hgss4/1_hires.png",
                 rarity = "Rare Holo"
             ),
@@ -33,8 +33,8 @@ object FirestoreRepository {
                 set = "Primal Clash",
                 hp = "50",
                 supertype = "Pokémon",
-                firstAttack = "String Shot",
-                price = "0.20",
+//                firstAttack = "String Shot",
+//                price = "0.20",
                 imageUrl = "https://images.pokemontcg.io/xy5/1_hires.png",
                 rarity = "Common"
             ),
@@ -43,8 +43,8 @@ object FirestoreRepository {
                 set = "Platinum",
                 hp = "130",
                 supertype = "Pokémon",
-                firstAttack = "Gigavolt",
-                price = "1.95",
+//                firstAttack = "Gigavolt",
+//                price = "1.95",
                 imageUrl = "https://images.pokemontcg.io/pl1/1_hires.png",
                 rarity = "Rare Holo"
             ),
@@ -53,8 +53,8 @@ object FirestoreRepository {
                 set = "Secret Wonders",
                 hp = "130",
                 supertype = "Pokémon",
-                firstAttack = "Jamming",
-                price = "2.50",
+//                firstAttack = "Jamming",
+//                price = "2.50",
                 imageUrl = "https://images.pokemontcg.io/dp3/1_hires.png",
                 rarity = "Rare Holo"
             ),
@@ -63,8 +63,8 @@ object FirestoreRepository {
                 set = "HS—Triumphant",
                 hp = "90",
                 supertype = "Pokémon",
-                firstAttack = "Sing",
-                price = "1.25",
+//                firstAttack = "Sing",
+//                price = "1.25",
                 imageUrl = "https://images.pokemontcg.io/hgss4/2_hires.png",
                 rarity = "Rare Holo"
             )
@@ -76,8 +76,8 @@ object FirestoreRepository {
                 "set" to card.set,
                 "hp" to card.hp,
                 "supertype" to card.supertype,
-                "firstAttack" to card.firstAttack,
-                "price" to card.price,
+//                "firstAttack" to card.firstAttack,
+//                "price" to card.price,
                 "imageUrl" to card.imageUrl,
                 "rarity" to card.rarity
             )

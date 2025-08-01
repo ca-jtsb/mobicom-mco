@@ -1,17 +1,18 @@
 package com.mobicom.s16.mco
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.mobicom.s16.mco.databinding.CardinfoPageBinding
+import com.bumptech.glide.Glide
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import android.graphics.Color
-import com.github.mikephil.charting.components.XAxis
+import com.mobicom.s16.mco.databinding.CardinfoPageBinding
 
-
-class CardInfoActivity : AppCompatActivity()   {
+class CardInfoActivity : AppCompatActivity() {
     private lateinit var binding: CardinfoPageBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,10 +26,169 @@ class CardInfoActivity : AppCompatActivity()   {
             finish()
         }
 
+        // Get card data from intent extras and populate views
+        populateCardData()
+    }
 
+    private fun populateCardData() {
+        // Basic card information
+        val cardName = intent.getStringExtra("CARD_NAME") ?: ""
+        val imageUrl = intent.getStringExtra("CARD_IMAGE_URL") ?: ""
+        val imageUrlLarge = intent.getStringExtra("CARD_IMAGE_URL_LARGE") ?: ""
+        val set = intent.getStringExtra("CARD_SET") ?: ""
+        val setSeries = intent.getStringExtra("CARD_SET_SERIES") ?: ""
+        val price = intent.getDoubleExtra("CARD_PRICE", 0.0)
+        val priceSource = intent.getStringExtra("CARD_PRICE_SOURCE") ?: ""
+        val number = intent.getStringExtra("CARD_NUMBER") ?: ""
+        val rarity = intent.getStringExtra("CARD_RARITY") ?: ""
+        val supertype = intent.getStringExtra("CARD_SUPERTYPE") ?: ""
+        val hp = intent.getStringExtra("CARD_HP") ?: ""
+        val artist = intent.getStringExtra("CARD_ARTIST") ?: ""
+        val flavorText = intent.getStringExtra("CARD_FLAVOR_TEXT") ?: ""
+
+        // Arrays
+        val types = intent.getStringArrayListExtra("CARD_TYPES") ?: arrayListOf()
+        val subtypes = intent.getStringArrayListExtra("CARD_SUBTYPES") ?: arrayListOf()
+
+        // Evolution
+        val evolvesFrom = intent.getStringExtra("CARD_EVOLVES_FROM") ?: ""
+        val evolvesTo = intent.getStringArrayListExtra("CARD_EVOLVES_TO") ?: arrayListOf()
+
+        // Abilities
+        val abilityName = intent.getStringExtra("CARD_ABILITY_NAME") ?: ""
+        val abilityText = intent.getStringExtra("CARD_ABILITY_TEXT") ?: ""
+        val abilityType = intent.getStringExtra("CARD_ABILITY_TYPE") ?: ""
+
+        // Attacks
+        val attack1Name = intent.getStringExtra("CARD_ATTACK1_NAME") ?: ""
+        val attack1Damage = intent.getStringExtra("CARD_ATTACK1_DAMAGE") ?: ""
+        val attack1Text = intent.getStringExtra("CARD_ATTACK1_TEXT") ?: ""
+        val attack1Cost = intent.getIntExtra("CARD_ATTACK1_COST", 0)
+        val attack1CostTypes = intent.getStringArrayListExtra("CARD_ATTACK1_COST_TYPES") ?: arrayListOf()
+
+        val attack2Name = intent.getStringExtra("CARD_ATTACK2_NAME") ?: ""
+        val attack2Damage = intent.getStringExtra("CARD_ATTACK2_DAMAGE") ?: ""
+        val attack2Text = intent.getStringExtra("CARD_ATTACK2_TEXT") ?: ""
+        val attack2Cost = intent.getIntExtra("CARD_ATTACK2_COST", 0)
+        val attack2CostTypes = intent.getStringArrayListExtra("CARD_ATTACK2_COST_TYPES") ?: arrayListOf()
+
+        // Weakness and Resistance
+        val weaknessType = intent.getStringExtra("CARD_WEAKNESS_TYPE") ?: ""
+        val weaknessValue = intent.getStringExtra("CARD_WEAKNESS_VALUE") ?: ""
+        val resistanceType = intent.getStringExtra("CARD_RESISTANCE_TYPE") ?: ""
+        val resistanceValue = intent.getStringExtra("CARD_RESISTANCE_VALUE") ?: ""
+
+        // Retreat cost
+        val retreatCost = intent.getIntExtra("CARD_RETREAT_COST", 0)
+        val retreatCostTypes = intent.getStringArrayListExtra("CARD_RETREAT_COST_TYPES") ?: arrayListOf()
+
+        // Populate basic information
+        binding.tvCardName.text = cardName
+
+        // Create a more detailed set display
+        val setDisplay = if (setSeries.isNotEmpty()) {
+            "$setSeries: $set"
+        } else {
+            set
+        }
+        binding.tvSeries.text = setDisplay
+
+        // Format price with source information
+        binding.tvPrice.text = when {
+            price > 0 -> {
+                val priceText = "$%.2f".format(price)
+                if (priceSource.isNotEmpty()) "$priceText ($priceSource)" else priceText
+            }
+            else -> "Price not available"
+        }
+
+        // Load card image (prefer large image for detail view)
+        val displayImageUrl = if (imageUrlLarge.isNotEmpty()) imageUrlLarge else imageUrl
+        Glide.with(this)
+            .load(displayImageUrl)
+            .into(binding.imgCard)
+
+        // Populate detailed information
+        binding.tvNum.text = number
+        binding.tvRarity.text = rarity
+
+        // Display primary type
+        binding.tvType.text = types.firstOrNull() ?: supertype
+        binding.tvHP.text = hp
+
+        // Display stage (first subtype)
+        binding.tvStage.text = subtypes.firstOrNull() ?: ""
+
+        // Handle abilities
+        if (abilityName.isNotEmpty()) {
+            binding.tvAbility.text = abilityName
+            binding.tvAbilityDesc.text = abilityText
+        } else {
+            hideAbilitySection()
+        }
+
+        // Handle first attack
+        if (attack1Name.isNotEmpty()) {
+            val attack1DisplayName = if (attack1Damage.isNotEmpty()) {
+                "$attack1Name ($attack1Damage)"
+            } else {
+                attack1Name
+            }
+            binding.tvAttack1.text = attack1DisplayName
+            binding.tvAttack1Desc.text = attack1Text
+        } else {
+            hideAttack1Section()
+        }
+
+        // Handle second attack
+        if (attack2Name.isNotEmpty()) {
+            val attack2DisplayName = if (attack2Damage.isNotEmpty()) {
+                "$attack2Name ($attack2Damage)"
+            } else {
+                attack2Name
+            }
+            binding.tvAttack2.text = attack2DisplayName
+            binding.tvAttack3Desc.text = attack2Text
+        } else {
+            hideAttack2Section()
+        }
+
+        // Handle weakness
+        if (weaknessType.isNotEmpty()) {
+            binding.tvWeakness.text = "$weaknessType$weaknessValue"
+        } else {
+            binding.tvWeakness.text = "None"
+        }
+
+        // Handle resistance
+        if (resistanceType.isNotEmpty()) {
+            binding.tvResistance.text = "$resistanceType$resistanceValue"
+        } else {
+            binding.tvResistance.text = "None"
+        }
+
+        // Handle retreat cost
+        binding.tvRetreat.text = retreatCost.toString()
+    }
+
+    private fun hideAbilitySection() {
+        binding.tvAbilityLbl.visibility = View.GONE
+        binding.tvAbility.visibility = View.GONE
+        binding.tvAbilityDesc.visibility = View.GONE
+    }
+
+    private fun hideAttack1Section() {
+        binding.tvAttack1Lbl.visibility = View.GONE
+        binding.tvAttack1.visibility = View.GONE
+        binding.tvAttack1Desc.visibility = View.GONE
+    }
+
+    private fun hideAttack2Section() {
+        binding.tvAttack2Lbl.visibility = View.GONE
+        binding.tvAttack2.visibility = View.GONE
+        binding.tvAttack3Desc.visibility = View.GONE
     }
 }
-
 
 fun setupDummyLineChart(lineChart: LineChart) {
     // Dummy data entries (x: days, y: price)
