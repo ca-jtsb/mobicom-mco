@@ -164,6 +164,32 @@ object FirestoreRepository {
             }
     }
 
+    fun getUserArchivedCards(onResult: (List<Card>) -> Unit, onError: (Exception) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return
+
+        firestore.collection("users")
+            .document(userId)
+            .collection("archive")
+            .get()
+            .addOnSuccessListener { result ->
+                val cards = result.mapNotNull { doc ->
+                    try {
+                        doc.toObject(Card::class.java)
+                    } catch (e: Exception) {
+                        Log.e("FirestoreRepo", "Error parsing archived card document", e)
+                        null
+                    }
+                }
+                onResult(cards)
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreRepo", "Failed to fetch archived cards", e)
+                onError(e)
+            }
+    }
+
+
+
     fun archiveCard(card: Card, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val user = auth.currentUser
         if (user == null) {
