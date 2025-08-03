@@ -264,7 +264,7 @@ class CardInfoActivity : AppCompatActivity() {
 
         binding.btnWishlist.setOnClickListener {
 
-            if(!isFromArchive){
+            if(isFromWishlist){
                 removeFromWishlist()
             }else{
                 wishlistCard()
