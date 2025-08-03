@@ -2,6 +2,7 @@ package com.mobicom.s16.mco.domain.model
 
 data class Card(
     val id: String = "",
+    val isArchived: Boolean = false,
     val name: String = "",
     val supertype: String = "",
     val subtypes: List<String>? = emptyList(),

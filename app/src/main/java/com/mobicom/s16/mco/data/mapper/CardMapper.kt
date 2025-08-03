@@ -1,14 +1,21 @@
 // File: data/mapper/CardMapper.kt
 package com.mobicom.s16.mco.data.mapper
 
-import com.mobicom.s16.mco.data.remote.dto.*
-import com.mobicom.s16.mco.domain.model.*
-import kotlin.collections.map
+import com.mobicom.s16.mco.data.remote.dto.AbilityDto
+import com.mobicom.s16.mco.data.remote.dto.ApiCard
+import com.mobicom.s16.mco.data.remote.dto.AttackDto
+import com.mobicom.s16.mco.data.remote.dto.ResistanceDto
+import com.mobicom.s16.mco.data.remote.dto.WeaknessDto
+import com.mobicom.s16.mco.domain.model.Ability
+import com.mobicom.s16.mco.domain.model.Attack
+import com.mobicom.s16.mco.domain.model.Card
+import com.mobicom.s16.mco.domain.model.Resistance
+import com.mobicom.s16.mco.domain.model.Weakness
 
 // Extension function to convert API DTO to domain model
 fun ApiCard.toDomainModel(): Card {
     // Extract the best available price
-    val (price, source) = extractBestPrice()
+    val (price, source) = extractMarketPrice()
 
     return Card(
         id = this.id,
@@ -100,6 +107,22 @@ private fun ApiCard.extractBestPrice(): Pair<Double, String> {
 
     return Pair(0.0, "")
 }
+
+
+private fun ApiCard.extractMarketPrice(): Pair<Double, String> {
+    this.tcgplayer?.prices?.let { prices ->
+        val marketPrice = prices.holofoil?.market
+            ?: prices.reverseHolofoil?.market
+            ?: prices.normal?.market
+
+        if (marketPrice != null && marketPrice > 0) {
+            return Pair(marketPrice, "TCGPlayer")
+        }
+    }
+
+    return Pair(0.0, "")
+}
+
 
 // Extension function to convert lists
 fun List<ApiCard>.toDomainModel(): List<Card> {

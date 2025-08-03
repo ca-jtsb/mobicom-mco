@@ -2,7 +2,6 @@ package com.mobicom.s16.mco
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.mobicom.s16.mco.data.remote.firebase.FirestoreRepository
 import com.mobicom.s16.mco.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -12,9 +11,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // testing
-        FirestoreRepository.addDummyCardToWishlist()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

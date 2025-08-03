@@ -39,16 +39,16 @@
         android:textColorHint="#717171"
         android:textColor="#717171"/>
 
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
-        android:paddingTop="15dp"
-        android:text="Forgot password?"
-        android:textColor="#48C774"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+<!--    <TextView-->
+<!--        android:id="@+id/textView5"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:paddingLeft="5dp"-->
+<!--        android:paddingTop="15dp"-->
+<!--        android:text="Forgot password?"-->
+<!--        android:textColor="#48C774"-->
+<!--        android:textSize="18sp"-->
+<!--        android:textStyle="bold" />-->
 
     <LinearLayout
         android:layout_width="match_parent"

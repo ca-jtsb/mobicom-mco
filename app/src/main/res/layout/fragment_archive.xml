@@ -35,14 +35,14 @@
             android:layout_height="30dp"
             android:src="@drawable/search"
             android:layout_marginEnd="12dp"
-            android:tint="?android:textColorPrimary" />
+            app:tint="?android:textColorPrimary" />
 
         <ImageView
             android:id="@+id/ivFilter"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/filter"
-            android:tint="?android:textColorPrimary" />
+            app:tint="?android:textColorPrimary" />
     </LinearLayout>
 
     <!-- Search bar (hidden initially) -->
@@ -56,7 +56,7 @@
         android:visibility="gone"
         android:background="@android:drawable/edit_text"
         android:padding="8dp"
-        android:textColor="?android:textColorPrimary"
+        android:textColor="@color/black"
         android:textColorHint="?android:textColorSecondary" />
 
     <TextView
