@@ -202,7 +202,11 @@ object FirestoreRepository {
             card.name.lowercase()
                 .replace(" ", "-")
                 .replace("(", "")
-                .replace(")", "") + "-card"
+                .replace(")", "") + "-card-" + card.number + "-" +
+                    card.set.lowercase()
+                        .replace(" ", "-")
+                        .replace("(", "")
+                        .replace(")", "")
         }
 
         val wishlistRef = userDoc.collection("wishlist").document(cardId)
@@ -229,7 +233,11 @@ object FirestoreRepository {
             card.name.lowercase()
                 .replace(" ", "-")
                 .replace("(", "")
-                .replace(")", "") + "-card"
+                .replace(")", "") + "-card-" + card.number + "-" +
+                card.set.lowercase()
+                    .replace(" ", "-")
+                    .replace("(", "")
+                    .replace(")", "")
         }
 
         val wishlistRef = userDoc.collection("wishlist").document(cardId)
@@ -255,7 +263,11 @@ object FirestoreRepository {
             card.name.lowercase()
                 .replace(" ", "-")
                 .replace("(", "")
-                .replace(")", "") + "-card"
+                .replace(")", "") + "-card-" + card.number + "-" +
+                    card.set.lowercase()
+                        .replace(" ", "-")
+                        .replace("(", "")
+                        .replace(")", "")
         }
 
         Log.d("FirestoreRepo", "removed dummy card: ${cardId}")
@@ -285,7 +297,11 @@ object FirestoreRepository {
             card.name.lowercase()
                 .replace(" ", "-")
                 .replace("(", "")
-                .replace(")", "") + "-card"
+                .replace(")", "") + "-card-" + card.number + "-" +
+                    card.set.lowercase()
+                        .replace(" ", "-")
+                        .replace("(", "")
+                        .replace(")", "")
         }
 
         val archiveRef = userDoc.collection("archive").document(cardId)
