@@ -13,6 +13,7 @@ import com.mobicom.s16.mco.data.remote.firebase.FirestoreRepository
 import com.mobicom.s16.mco.databinding.FragmentTabRecyclerBinding
 import com.mobicom.s16.mco.domain.model.Card
 
+
 class WishlistTabFragment : Fragment(), FilterableTab {
 
     private var _binding: FragmentTabRecyclerBinding? = null
@@ -90,10 +91,25 @@ class WishlistTabFragment : Fragment(), FilterableTab {
         refreshAdapter()
     }
 
+    override fun searchCards(query: String) {
+        val filtered = wishlistCards.filter { card ->
+            (currentSet == null || card.set.equals(currentSet, ignoreCase = true)) &&
+                    (currentType == null || card.supertype.equals(currentType, ignoreCase = true)) &&
+                    (currentRarity == null || card.rarity?.equals(currentRarity, ignoreCase = true) == true) &&
+                    (query.isBlank() || card.name.contains(query, ignoreCase = true))
+        }
+        adapter.updateData(filtered)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun showGlobalResults(cards: List<Card>) {
+        adapter.updateData(cards)
+    }
+
 
     fun getWishlistCards(): List<Card> = wishlistCards
 

@@ -29,6 +29,10 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
     private var currentType: String? = null
     private var currentRarity: String? = null
 
+    // ✅ Helper to check if adapter is initialized
+    private val isAdapterReady: Boolean
+        get() = this::adapter.isInitialized
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,9 +57,7 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
             onResult = { cards ->
                 archivedCards = cards
                 Log.d("ArchiveTabFragment", "Loaded ${cards.size} archived cards from Firestore")
-
-                // Apply filters now that cards are available
-                refreshAdapter()
+                refreshAdapter() // safe now because adapter is initialized
             },
             onError = { e ->
                 Log.e("ArchiveTabFragment", "Error loading archived cards", e)
@@ -80,6 +82,7 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
     }
 
     private fun refreshAdapter() {
+        if (!isAdapterReady) return // 🚫 Prevent crash
         val filtered = archivedCards.filter { card ->
             (currentSet == null || card.set.equals(currentSet, ignoreCase = true)) &&
                     (currentType == null || card.supertype.equals(currentType, ignoreCase = true)) &&
@@ -96,10 +99,26 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
         refreshAdapter()
     }
 
+    override fun searchCards(query: String) {
+        if (!isAdapterReady) return // 🚫 Prevent crash
+        val filtered = archivedCards.filter { card ->
+            (currentSet == null || card.set.equals(currentSet, ignoreCase = true)) &&
+                    (currentType == null || card.supertype.equals(currentType, ignoreCase = true)) &&
+                    (currentRarity == null || card.rarity?.equals(currentRarity, ignoreCase = true) == true) &&
+                    (query.isBlank() || card.name.contains(query, ignoreCase = true))
+        }
+        adapter.updateData(filtered)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun showGlobalResults(cards: List<Card>) {
+        adapter.updateData(cards)
+    }
+
 
     fun getArchivedCards(): List<Card> = archivedCards
 }

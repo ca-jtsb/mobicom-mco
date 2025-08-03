@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/archiveLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?android:colorBackground">
 
-    <!-- Top bar with title and icons -->
+    <!-- Top bar -->
     <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -15,18 +17,20 @@
         android:gravity="center_vertical"
         android:background="?android:colorBackground">
 
+        <!-- Title -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Archive"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="?android:textColorPrimary" />
 
+        <!-- Search Icon -->
         <ImageView
-            android:id="@+id/ivSearch"
+            android:id="@+id/ivSearchIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/search"
@@ -41,7 +45,35 @@
             android:tint="?android:textColorPrimary" />
     </LinearLayout>
 
-    <!-- Tabs for Archive and Wishlist -->
+    <!-- Search bar (hidden initially) -->
+    <EditText
+        android:id="@+id/etSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search cards"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:visibility="gone"
+        android:background="@android:drawable/edit_text"
+        android:padding="8dp"
+        android:textColor="?android:textColorPrimary"
+        android:textColorHint="?android:textColorSecondary" />
+
+    <TextView
+        android:id="@+id/tvGlobalSearchPrompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search for global results"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="14sp"
+        android:paddingTop="8dp"
+        android:visibility="gone"
+        android:layout_marginStart="16dp"
+        android:clickable="true"
+        android:focusable="true" />
+
+
+    <!-- Tabs -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
@@ -50,10 +82,31 @@
         app:tabSelectedTextColor="?attr/colorPrimary"
         app:tabTextColor="?android:textColorSecondary" />
 
-    <!-- ViewPager2 for tab fragments -->
+    <!-- ViewPager2 -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/globalResultsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        />
 </LinearLayout>

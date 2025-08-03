@@ -5,45 +5,25 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.mobicom.s16.mco.util.CardCacheManager
 
 class LauncherActivity : AppCompatActivity() {
-
-    private val skipDownload = true // Toggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val user = FirebaseAuth.getInstance().currentUser
-        Log.d("LauncherActivity", "User is: $user")
+        Log.d("LauncherActivity", "User is: ${user?.uid ?: "null"}")
 
-        if (user != null) {
-            if (skipDownload) {
-                Log.d("LauncherActivity", "skipDownload=true, launching MainActivity directly")
-                startActivity(Intent(this, MainActivity::class.java))
-            } else {
-                val isAvailable = CardCacheManager.isCacheAvailable(this)
-                val isComplete = CardCacheManager.isCacheComplete(this)
-                Log.d("LauncherActivity", "Card cache available: $isAvailable, complete: $isComplete")
-
-                val intent = if (!isAvailable || !isComplete) {
-                    Log.d("LauncherActivity", "Launching DownloadActivity (missing or incomplete cache)")
-                    Intent(this, DownloadActivity::class.java).apply {
-                        putExtra("missingOnly", isAvailable)
-                    }
-                } else {
-                    Log.d("LauncherActivity", "Launching MainActivity")
-                    Intent(this, MainActivity::class.java)
-                }
-
-                startActivity(intent)
-            }
-        } else {
-            Log.d("LauncherActivity", "User not signed in, going to LoginActivity")
+        // 🔐 Redirect to login if no user is signed in
+        if (user == null) {
             startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
         }
 
+        // 🚀 Skip cache checks, go directly to MainActivity
+        Log.d("LauncherActivity", "Launching MainActivity")
+        startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
 }
-

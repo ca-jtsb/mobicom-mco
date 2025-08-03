@@ -114,6 +114,13 @@ class PokemonAdapter(private var cards: List<Card>, private var tab: String) :
 
     override fun getItemCount(): Int = cards.size
 
+    fun appendData(newCards: List<Card>) {
+        val oldSize = cards.size
+        cards = cards + newCards
+        notifyItemRangeInserted(oldSize, newCards.size)
+    }
+
+
     fun updateData(newCards: List<Card>) {
         cards = newCards
         notifyDataSetChanged()

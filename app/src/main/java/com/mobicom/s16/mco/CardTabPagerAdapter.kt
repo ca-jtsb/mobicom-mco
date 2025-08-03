@@ -14,8 +14,3 @@ class CardTabPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
         }
     }
 }
-
-// Optional interface for filterable tabs
-interface FilterableTab {
-    fun applyFilters(set: String?, type: String?, rarity: String?)
-}
