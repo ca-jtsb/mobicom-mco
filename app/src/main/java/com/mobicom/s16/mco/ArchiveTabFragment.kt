@@ -1,6 +1,7 @@
 package com.mobicom.s16.mco
 
 import PokemonAdapter
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,6 +22,9 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
     private var archivedCards: List<Card> = emptyList()
     private lateinit var adapter: PokemonAdapter
 
+    private lateinit var cardInfoLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
+
+
     private var currentSet: String? = null
     private var currentType: String? = null
     private var currentRarity: String? = null
@@ -38,12 +42,29 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
 
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        adapter = PokemonAdapter(emptyList())
+        adapter = PokemonAdapter(emptyList(), "ARCHIVE")
+
         binding.recyclerView.adapter = adapter
 
         val user = FirebaseAuth.getInstance().currentUser
         Log.d("ArchiveTabFragment", "Current user: ${user?.uid ?: "null"}")
 
+        FirestoreRepository.getUserArchivedCards(
+            onResult = { cards ->
+                archivedCards = cards
+                Log.d("ArchiveTabFragment", "Loaded ${cards.size} archived cards from Firestore")
+
+                // Apply filters now that cards are available
+                refreshAdapter()
+            },
+            onError = { e ->
+                Log.e("ArchiveTabFragment", "Error loading archived cards", e)
+            }
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
         FirestoreRepository.getUserArchivedCards(
             onResult = { cards ->
                 archivedCards = cards

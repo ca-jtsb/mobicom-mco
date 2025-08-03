@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#8c55b0">
+    android:background="#6FC39D">
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -210,6 +210,7 @@
                                 android:textColor="#000000"
                                 android:textSize="16sp" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -475,7 +476,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#C7C6C6"
+                    android:backgroundTint="#6FC39D"
                     android:text="Add to Wishlist" />
             </LinearLayout>
 

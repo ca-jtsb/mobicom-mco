@@ -1,8 +1,10 @@
 package com.mobicom.s16.mco
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.charts.LineChart
@@ -11,11 +13,14 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.mobicom.s16.mco.databinding.CardinfoPageBinding
+import androidx.core.graphics.toColorInt
 
 
 class CardInfoActivity : AppCompatActivity() {
     private lateinit var binding: CardinfoPageBinding
     private lateinit var cardToArchive: com.mobicom.s16.mco.domain.model.Card
+    private var sourceTab: String? = null
+    private var isFromArchive: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +35,19 @@ class CardInfoActivity : AppCompatActivity() {
 
         // Get card data from intent extras and populate views
         populateCardData()
+
+        sourceTab = intent.getStringExtra("SOURCE_TAB")
+        isFromArchive = sourceTab == "ARCHIVE"
+
+        if (isFromArchive) {
+            binding.btnArchive.text = "REMOVE CARD"
+            binding.btnArchive.backgroundTintList = ColorStateList.valueOf("#f44336".toColorInt())
+            binding.btnWishlist.text = "MOVE TO WISHLIST"
+        }else{
+            binding.btnWishlist.text = "REMOVE CARD"
+            binding.btnWishlist.backgroundTintList = ColorStateList.valueOf("#f44336".toColorInt())
+            binding.btnArchive.text = "MOVE TO ARCHIVE"
+        }
     }
 
     private fun populateCardData() {
@@ -229,12 +247,26 @@ class CardInfoActivity : AppCompatActivity() {
             priceSource = priceSource
         )
 
+
         binding.btnArchive.setOnClickListener {
-            archiveCard()
+            //val btnText = binding.btnArchive.text
+            if(isFromArchive){
+                removeFromArchive()
+            }else{
+                archiveCard()
+            }
+        }
+
+        binding.btnWishlist.setOnClickListener {
+            //val btnText = binding.btnArchive.text
+            if(isFromArchive){
+                wishlistCard()
+            }else{
+                removeFromWishlist()
+            }
         }
 
     }
-
 
 
     private fun hideAbilitySection() {
@@ -259,7 +291,66 @@ class CardInfoActivity : AppCompatActivity() {
         com.mobicom.s16.mco.data.remote.firebase.FirestoreRepository.archiveCard(
             card = cardToArchive,
             onSuccess = {
+                val resultIntent = intent.apply {
+                    putExtra("ARCHIVED_CARD_ID", cardToArchive.id) // Add ID in intent if needed
+                }
+                setResult(RESULT_OK, resultIntent)
                 finish() // Close activity or show a toast/snackbar
+                Toast.makeText(this, "Card successfully saved", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = {
+                it.printStackTrace()
+                // Optionally show error message
+            }
+        )
+    }
+
+    private fun wishlistCard() {
+        com.mobicom.s16.mco.data.remote.firebase.FirestoreRepository.wishlistCard(
+            card = cardToArchive,
+            onSuccess = {
+                val resultIntent = intent.apply {
+                    putExtra("ARCHIVED_CARD_ID", cardToArchive.id) // Add ID in intent if needed
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish() // Close activity or show a toast/snackbar
+                Toast.makeText(this, "Card successfully saved", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = {
+                it.printStackTrace()
+                // Optionally show error message
+            }
+        )
+    }
+
+    private fun removeFromArchive(){
+        com.mobicom.s16.mco.data.remote.firebase.FirestoreRepository.removeCardFromArchive(
+            card = cardToArchive,
+            onSuccess = {
+                val resultIntent = intent.apply {
+                    putExtra("ARCHIVED_CARD_ID", cardToArchive.id) // Add ID in intent if needed
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish() // Close activity or show a toast/snackbar
+                Toast.makeText(this, "Card successfully removed", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = {
+                it.printStackTrace()
+                // Optionally show error message
+            }
+        )
+    }
+
+    private fun removeFromWishlist(){
+        com.mobicom.s16.mco.data.remote.firebase.FirestoreRepository.removeCardFromWishlist(
+            card = cardToArchive,
+            onSuccess = {
+                val resultIntent = intent.apply {
+                    putExtra("ARCHIVED_CARD_ID", cardToArchive.id) // Add ID in intent if needed
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish() // Close activity or show a toast/snackbar
+                Toast.makeText(this, "Card successfully removed", Toast.LENGTH_SHORT).show()
             },
             onFailure = {
                 it.printStackTrace()

@@ -39,7 +39,7 @@ class WishlistTabFragment : Fragment(), FilterableTab {
 
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        adapter = PokemonAdapter(emptyList())
+        adapter = PokemonAdapter(emptyList(), "WISHLIST")
         binding.recyclerView.adapter = adapter
 
         val user = FirebaseAuth.getInstance().currentUser
@@ -54,6 +54,22 @@ class WishlistTabFragment : Fragment(), FilterableTab {
                 refreshAdapter()
             },
             onError = { e -> e.printStackTrace() }
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        FirestoreRepository.getUserWishlistCards(
+            onResult = { cards ->
+                wishlistCards = cards
+                Log.d("ArchiveTabFragment", "Loaded ${cards.size} archived cards from Firestore")
+
+                // Apply filters now that cards are available
+                refreshAdapter()
+            },
+            onError = { e ->
+                Log.e("ArchiveTabFragment", "Error loading archived cards", e)
+            }
         )
     }
 
