@@ -21,6 +21,7 @@ class CardInfoActivity : AppCompatActivity() {
     private lateinit var cardToArchive: com.mobicom.s16.mco.domain.model.Card
     private var sourceTab: String? = null
     private var isFromArchive: Boolean = false
+    private var isFromWishlist: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +39,19 @@ class CardInfoActivity : AppCompatActivity() {
 
         sourceTab = intent.getStringExtra("SOURCE_TAB")
         isFromArchive = sourceTab == "ARCHIVE"
+        isFromWishlist = sourceTab == "WISHLIST"
 
         if (isFromArchive) {
             binding.btnArchive.text = "REMOVE CARD"
             binding.btnArchive.backgroundTintList = ColorStateList.valueOf("#f44336".toColorInt())
             binding.btnWishlist.text = "MOVE TO WISHLIST"
         }else{
-            binding.btnWishlist.text = "REMOVE CARD"
-            binding.btnWishlist.backgroundTintList = ColorStateList.valueOf("#f44336".toColorInt())
-            binding.btnArchive.text = "MOVE TO ARCHIVE"
+            if(isFromWishlist) {
+                binding.btnWishlist.text = "REMOVE CARD"
+                binding.btnWishlist.backgroundTintList =
+                    ColorStateList.valueOf("#f44336".toColorInt())
+                binding.btnArchive.text = "MOVE TO ARCHIVE"
+            }
         }
     }
 
