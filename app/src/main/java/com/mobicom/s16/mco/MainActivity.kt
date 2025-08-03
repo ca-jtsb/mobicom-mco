@@ -16,7 +16,6 @@ class MainActivity : AppCompatActivity() {
         // testing
         FirestoreRepository.addDummyCardToWishlist()
 
-
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.frameLayout, ArchiveFragment())

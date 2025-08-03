@@ -16,14 +16,16 @@ interface PokemonTcgApi {
         @Query("pageSize") pageSize: Int = 250
     ): Call<CardsResponse>
 
+    @Headers("X-Api-Key: 311afd9e-7f7a-4e7e-ab12-51f2ecba9973") // ✅ Add this
     @GET("cards")
     fun searchCardByNameAndNumber(
         @Query("q") query: String
+
     ): Call<CardsResponse>
 
+    @Headers("X-Api-Key: 311afd9e-7f7a-4e7e-ab12-51f2ecba9973") // Optional but good for consistency
     @GET("cards/{id}")
     fun getCardById(
         @Path("id") id: String
     ): Call<SingleCardResponse>
-
 }

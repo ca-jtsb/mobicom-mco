@@ -7,7 +7,7 @@ import com.mobicom.s16.mco.CardInfoActivity
 import com.mobicom.s16.mco.databinding.CardRowBinding
 import com.mobicom.s16.mco.domain.model.Card
 
-class PokemonAdapter(private var cards: List<Card>) :
+class PokemonAdapter(private var cards: List<Card>, private var tab: String) :
     RecyclerView.Adapter<PokemonAdapter.CardViewHolder>() {
 
     inner class CardViewHolder(val binding: CardRowBinding) :
@@ -104,6 +104,8 @@ class PokemonAdapter(private var cards: List<Card>) :
                 // Retreat cost
                 putExtra("CARD_RETREAT_COST", card.convertedRetreatCost ?: 0)
                 putStringArrayListExtra("CARD_RETREAT_COST_TYPES", ArrayList(card.retreatCost ?: emptyList()))
+
+                putExtra("SOURCE_TAB", tab)
             }
 
             holder.itemView.context.startActivity(intent)
@@ -111,6 +113,13 @@ class PokemonAdapter(private var cards: List<Card>) :
     }
 
     override fun getItemCount(): Int = cards.size
+
+    fun appendData(newCards: List<Card>) {
+        val oldSize = cards.size
+        cards = cards + newCards
+        notifyItemRangeInserted(oldSize, newCards.size)
+    }
+
 
     fun updateData(newCards: List<Card>) {
         cards = newCards

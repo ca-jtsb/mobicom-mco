@@ -1,6 +1,7 @@
 package com.mobicom.s16.mco
 
 import PokemonAdapter
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,9 +22,16 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
     private var archivedCards: List<Card> = emptyList()
     private lateinit var adapter: PokemonAdapter
 
+    private lateinit var cardInfoLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
+
+
     private var currentSet: String? = null
     private var currentType: String? = null
     private var currentRarity: String? = null
+
+    // ✅ Helper to check if adapter is initialized
+    private val isAdapterReady: Boolean
+        get() = this::adapter.isInitialized
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,12 +46,27 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
 
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        adapter = PokemonAdapter(emptyList())
+        adapter = PokemonAdapter(emptyList(), "ARCHIVE")
+
         binding.recyclerView.adapter = adapter
 
         val user = FirebaseAuth.getInstance().currentUser
         Log.d("ArchiveTabFragment", "Current user: ${user?.uid ?: "null"}")
 
+        FirestoreRepository.getUserArchivedCards(
+            onResult = { cards ->
+                archivedCards = cards
+                Log.d("ArchiveTabFragment", "Loaded ${cards.size} archived cards from Firestore")
+                refreshAdapter() // safe now because adapter is initialized
+            },
+            onError = { e ->
+                Log.e("ArchiveTabFragment", "Error loading archived cards", e)
+            }
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
         FirestoreRepository.getUserArchivedCards(
             onResult = { cards ->
                 archivedCards = cards
@@ -59,6 +82,7 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
     }
 
     private fun refreshAdapter() {
+        if (!isAdapterReady) return // 🚫 Prevent crash
         val filtered = archivedCards.filter { card ->
             (currentSet == null || card.set.equals(currentSet, ignoreCase = true)) &&
                     (currentType == null || card.supertype.equals(currentType, ignoreCase = true)) &&
@@ -75,10 +99,26 @@ class ArchiveTabFragment : Fragment(), FilterableTab {
         refreshAdapter()
     }
 
+    override fun searchCards(query: String) {
+        if (!isAdapterReady) return // 🚫 Prevent crash
+        val filtered = archivedCards.filter { card ->
+            (currentSet == null || card.set.equals(currentSet, ignoreCase = true)) &&
+                    (currentType == null || card.supertype.equals(currentType, ignoreCase = true)) &&
+                    (currentRarity == null || card.rarity?.equals(currentRarity, ignoreCase = true) == true) &&
+                    (query.isBlank() || card.name.contains(query, ignoreCase = true))
+        }
+        adapter.updateData(filtered)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun showGlobalResults(cards: List<Card>) {
+        adapter.updateData(cards)
+    }
+
 
     fun getArchivedCards(): List<Card> = archivedCards
 }

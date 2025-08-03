@@ -217,4 +217,82 @@ object FirestoreRepository {
             .addOnFailureListener { onFailure(it) }
     }
 
+    fun wishlistCard(card: Card, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val user = auth.currentUser
+        if (user == null) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
+        val userDoc = firestore.collection("users").document(user.uid)
+        val cardId = card.id.ifBlank {
+            card.name.lowercase()
+                .replace(" ", "-")
+                .replace("(", "")
+                .replace(")", "") + "-card"
+        }
+
+        val wishlistRef = userDoc.collection("wishlist").document(cardId)
+        val archiveRef = userDoc.collection("archive").document(cardId)
+
+        wishlistRef.set(card)
+            .addOnSuccessListener {
+                archiveRef.delete()
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { onFailure(it) }
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    fun removeCardFromWishlist(card: Card, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val user = auth.currentUser
+        if (user == null) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
+        val cardId = card.id.ifBlank {
+            card.name.lowercase()
+                .replace(" ", "-")
+                .replace("(", "")
+                .replace(")", "") + "-card"
+        }
+
+        Log.d("FirestoreRepo", "removed dummy card: ${cardId}")
+
+        val wishlistRef = firestore.collection("users")
+            .document(user.uid)
+            .collection("wishlist")
+            .document(cardId)
+
+        wishlistRef.delete()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener {
+                Log.e("FirestoreRepo", "Failed to delete card", it)
+                onFailure(it)
+            }
+    }
+
+    fun removeCardFromArchive(card: Card, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val user = auth.currentUser
+        if (user == null) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
+        val userDoc = firestore.collection("users").document(user.uid)
+        val cardId = card.id.ifBlank {
+            card.name.lowercase()
+                .replace(" ", "-")
+                .replace("(", "")
+                .replace(")", "") + "-card"
+        }
+
+        val archiveRef = userDoc.collection("archive").document(cardId)
+
+        archiveRef.delete()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
 }
