@@ -1,3 +1,5 @@
+val huggingfaceToken = "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"
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,6 +20,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "HUGGINGFACE_TOKEN", "\"$huggingfaceToken\"")
     }
 
     buildTypes {
@@ -38,6 +41,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     packagingOptions {
         resources {

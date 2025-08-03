@@ -25,7 +25,6 @@ interface PokemonTcgApi {
 
     @Headers("X-Api-Key: 311afd9e-7f7a-4e7e-ab12-51f2ecba9973") // Optional but good for consistency
     @GET("cards/{id}")
-    fun getCardById(
-        @Path("id") id: String
-    ): Call<SingleCardResponse>
+    fun getCardById(@Path("id") id: String): Call<SingleCardResponse>
+
 }

@@ -21,4 +21,6 @@ object RetrofitClient {
             .build()
             .create(PokemonTcgApi::class.java)
     }
+
+
 }
