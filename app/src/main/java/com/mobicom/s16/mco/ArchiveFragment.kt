@@ -89,11 +89,15 @@ class ArchiveFragment : Fragment() {
         binding.ivFilter.setOnClickListener {
             val currentFragment = getCurrentTabFragment()
 
-            if (currentFragment is WishlistTabFragment) {
-                val wishlistCards = currentFragment.getWishlistCards()
+            if (currentFragment is FilterableTab) {
+                val cards = when (currentFragment) {
+                    is WishlistTabFragment -> currentFragment.getWishlistCards()
+                    is ArchiveTabFragment -> currentFragment.getArchivedCards() // make sure this exists
+                    else -> emptyList()
+                }
 
                 val dialog = CardFilterDialog(
-                    cards = wishlistCards, // only from wishlist
+                    cards = cards,
                     defaultSet = currentSet,
                     defaultType = currentType,
                     defaultRarity = currentRarity

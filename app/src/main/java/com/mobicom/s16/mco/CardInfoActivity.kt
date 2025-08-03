@@ -28,7 +28,7 @@ class CardInfoActivity : AppCompatActivity() {
         binding = CardinfoPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupDummyLineChart(binding.priceChart)
+        //setupDummyLineChart(binding.priceChart)
         binding.imgBack.setOnClickListener {
             finish()
         }
