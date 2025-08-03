@@ -249,7 +249,7 @@ class CardInfoActivity : AppCompatActivity() {
 
 
         binding.btnArchive.setOnClickListener {
-            //val btnText = binding.btnArchive.text
+
             if(isFromArchive){
                 removeFromArchive()
             }else{
@@ -258,11 +258,11 @@ class CardInfoActivity : AppCompatActivity() {
         }
 
         binding.btnWishlist.setOnClickListener {
-            //val btnText = binding.btnArchive.text
-            if(isFromArchive){
-                wishlistCard()
-            }else{
+
+            if(!isFromArchive){
                 removeFromWishlist()
+            }else{
+                wishlistCard()
             }
         }
 
