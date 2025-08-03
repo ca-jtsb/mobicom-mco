@@ -1,6 +1,7 @@
 package com.mobicom.s16.mco
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -119,7 +120,18 @@ class ScannerFragment : Fragment() {
         val image = InputImage.fromFilePath(requireContext(), Uri.fromFile(imageFile))
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-        // Get focusBox bounds
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+
+        // ✅ Use full image for classification
+        val setSymbolLabel = classifySetSymbol(requireContext(), bitmap)
+
+        if (setSymbolLabel == null) {
+            Toast.makeText(requireContext(), "Set symbol not recognized", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        Log.d("OCR", "Set symbol detected: $setSymbolLabel")
+
         val focusTop = binding.focusBox.top
         val focusBottom = binding.focusBox.bottom
 
@@ -128,7 +140,6 @@ class ScannerFragment : Fragment() {
                 Log.d("OCR", "Full recognized text:\n${visionText.text}")
 
                 var cardNumberRaw: String? = null
-                var cardName: String? = null
                 val cardNumberRegex = Regex("""\b(\d{1,3})/(\d{1,3})\b""")
 
                 for (block in visionText.textBlocks) {
@@ -137,85 +148,63 @@ class ScannerFragment : Fragment() {
                         val lineText = line.text.trim()
                         val cleanedLine = lineText.replace(Regex("[^0-9/]"), "")
 
-                        // Only use lines inside focus box vertical range
-                        if (y in focusTop..focusBottom) {
-                            Log.d("OCR_FILTERED_LINE", "Line (y=$y): $lineText")
+                        Log.d("OCR_LINE", "Line: '$lineText' cleaned: '$cleanedLine' y=$y")
 
-                            if (cardNumberRaw == null && cardNumberRegex.containsMatchIn(cleanedLine)) {
-                                cardNumberRaw = cardNumberRegex.find(cleanedLine)?.value
-                            }
-
-                            if (cardName == null && lineText.length in 3..30 && !lineText.contains("/")) {
-                                cardName = lineText
-                            }
+                        if (y in focusTop..focusBottom && cardNumberRaw == null && cardNumberRegex.containsMatchIn(cleanedLine)) {
+                            cardNumberRaw = cardNumberRegex.find(cleanedLine)?.value
+                            Log.d("OCR_NUMBER", "Detected card number: $cardNumberRaw")
                         }
                     }
                 }
 
-                // Fallback name if not found inside focus box
-                if (cardName == null) {
-                    cardName = visionText.text.lines()
-                        .firstOrNull { it.length in 3..30 && !it.contains("/") }
-                        ?.trim()
-                }
-
-                Log.d("OCR_RESULT", "Detected card number: $cardNumberRaw")
-                Log.d("OCR_RESULT", "Detected card name: $cardName")
-
-                if (cardNumberRaw != null && cardName != null) {
+                if (cardNumberRaw != null) {
                     val parts = cardNumberRaw.split("/")
                     val cardNumber = parts.getOrNull(0)?.trim()
                     val printedTotal = parts.getOrNull(1)?.trim()?.toIntOrNull()
 
+                    Log.d("OCR", "Parsed cardNumber=$cardNumber printedTotal=$printedTotal")
+
                     if (cardNumber != null && printedTotal != null) {
-                        searchCardByNumberAndName(cardNumber, printedTotal, cardName)
+                        searchCardBySetAndNumber(setSymbolLabel, cardNumber, printedTotal)
                     } else {
-                        Toast.makeText(requireContext(), "Invalid card number format", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Invalid number format", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Toast.makeText(requireContext(), "Card number or name not found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Card number not found", Toast.LENGTH_SHORT).show()
                 }
             }
-            .addOnFailureListener { e ->
-                Log.e("OCR", "Text recognition failed", e)
-                Toast.makeText(requireContext(), "OCR failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener {
+                Log.e("OCR", "Text recognition failed", it)
+                Toast.makeText(requireContext(), "OCR failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
+    private fun searchCardBySetAndNumber(setSymbol: String, cardNumber: String, printedTotal: Int) {
+        val query = """set.id:\"$setSymbol\" number:$cardNumber"""
 
-
-
-    private fun searchCardByNumberAndName(cardNumber: String, printedTotal: Int, cardName: String) {
-        val query = "number:\"$cardNumber\""
-        Log.d("API_CALL", "Searching with: number=$cardNumber, printedTotal=$printedTotal, name=$cardName")
-
+        Log.d("API_CALL", "Querying with: $query")
         RetrofitClient.api.searchCardByNameAndNumber(query).enqueue(object : Callback<CardsResponse> {
             override fun onResponse(call: Call<CardsResponse>, response: Response<CardsResponse>) {
                 if (response.isSuccessful) {
                     val cards = response.body()?.data ?: emptyList()
-                    val matchedCards = cards.filter {
-                        it.set.printedTotal == printedTotal &&
-                                it.name.equals(cardName, ignoreCase = true)
+                    Log.d("API_RESULT", "Found ${cards.size} cards with set=$setSymbol and number=$cardNumber")
+
+                    val matchedCard = cards.firstOrNull {
+                        (it.set.printedTotal ?: -1) == printedTotal
                     }
 
-                    if (matchedCards.isNotEmpty()) {
-                        val matchedCard = matchedCards.first()
-                        Log.d("CARD_MATCH", "Matched: ${matchedCard.name} ${matchedCard.number}/${matchedCard.set.printedTotal}")
-                        Toast.makeText(requireContext(), "Detected: ${matchedCard.name} (#${matchedCard.number})", Toast.LENGTH_SHORT).show()
+                    if (matchedCard != null) {
                         openCardInfo(matchedCard)
                     } else {
-                        Toast.makeText(requireContext(), "No exact match found", Toast.LENGTH_SHORT).show()
-                        Log.d("API_RESULT", "No matching cards found after filtering")
+                        Toast.makeText(requireContext(), "No matching card found", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(requireContext(), "API Error: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    Log.e("API_RESULT", "API error: ${response.code()} - ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<CardsResponse>, t: Throwable) {
                 Toast.makeText(requireContext(), "API Failure: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("API_RESULT", "API request failed", t)
             }
         })
     }

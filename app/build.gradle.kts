@@ -80,10 +80,12 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("io.coil-kt:coil:2.4.0")
-    implementation ("com.google.mlkit:text-recognition:16.0.0")
+    //implementation ("com.google.mlkit:text-recognition:16.0.0")
+    implementation("com.google.mlkit:text-recognition:16.0.0-beta3")
     implementation ("org.tensorflow:tensorflow-lite-task-vision:0.4.4")
     implementation ("org.tensorflow:tensorflow-lite:2.13.0")
     implementation ("org.tensorflow:tensorflow-lite-support:0.4.3")
     implementation ("org.tensorflow:tensorflow-lite-gpu:2.13.0")
     implementation("com.google.guava:guava:31.1-android")
+
 }
